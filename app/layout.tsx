@@ -24,22 +24,22 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "SpendMRR — Spend Someone's MRR",
-  description: "Pick a startup, spend their MRR on stuff, and share the receipt",
-  metadataBase: new URL("https://spendmrr.vercel.app"),
-  openGraph: {
-    title: "SpendMRR — Spend Someone's MRR",
-    description: "Pick a startup, spend their MRR on stuff, and share the receipt",
-    siteName: "SpendMRR",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SpendMRR — Spend Someone's MRR",
-    description: "Pick a startup, spend their MRR on stuff, and share the receipt",
-  },
-};
+// export const metadata: Metadata = {
+//   title: "Replore",
+//   description: "",
+//   metadataBase: new URL(""),
+//   openGraph: {
+//     title: "Replore",
+//     description: "",
+//     siteName: "Replore",
+//     type: "website",
+//   },
+//   twitter: {
+//     card: "summary_large_image",
+//     title: "Replore",
+//     description: "",
+//   },
+// };
 
 export default function RootLayout({
   children,
@@ -48,21 +48,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {process.env.NODE_ENV === "development" && (
-          <Script
-            src="//unpkg.com/react-grab/dist/index.global.js"
-            crossOrigin="anonymous"
-            strategy="beforeInteractive"
-          />
-        )}
-        {process.env.NODE_ENV === "development" && (
-          <Script
-            src="//unpkg.com/@react-grab/mcp/dist/client.global.js"
-            strategy="lazyOnload"
-          />
-        )}
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} antialiased`}
       >
