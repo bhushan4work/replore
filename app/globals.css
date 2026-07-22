@@ -69,3 +69,13 @@ body {
 .animate-print-slide {
   animation: print-slide 0.5s ease-out forwards;
 }
+
+::selection {
+  background: #7503f8;
+  color: white;
+}
+
+::-moz-selection {
+  background: #7503f8;
+  color: white;
+}

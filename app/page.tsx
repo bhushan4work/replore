@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
 import { GithubStar } from "@/components/github-star";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div className="relative min-h-screen bg-zinc-50 font-[family-name:var(--font-geist-sans)] dark:bg-zinc-950">
       {/* Hero with Warp shader */}
@@ -37,25 +39,44 @@ export default function Home() {
           </h1>
 
           <p className="mx-auto mt-3 max-w-xl text-lg text-white/90 drop-shadow">
-            discover, understand and explore any gitHub repository with ai.
+            discover, understand and explore any github repository with ai.
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className="absolute bottom-10 left-1/2 z-20 w-full max-w-md -translate-x-1/2 px-4">
-          <div className="relative">
-            <MagnifyingGlass
-              className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400"
-              weight="bold"
-            />
+        {/* Search Bar */}
+        <div className="absolute bottom-10 left-1/2 z-20 w-full max-w-xl -translate-x-1/2 px-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              router.push("/analyze/docs");
+            }}
+            className="flex items-center gap-3"
+          >
+            {/* Input */}
+            <div className="relative flex-1">
+              <MagnifyingGlass
+                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400"
+                weight="bold"
+              />
 
-            <input
-              type="text"
-              placeholder="https://github.com/repo-name"
-              className="w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-10 text-sm text-white placeholder-zinc-400 outline-none shadow-2xl"
-            />
-          </div>
+              <input
+                type="text"
+                placeholder="https://github.com/repo-name"
+                className="w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-4 text-sm text-white placeholder-zinc-400 outline-none shadow-2xl"
+              />
+            </div>
+
+            {/* Analyze Button */}
+            <button
+              type="submit"
+              className="cursor-pointer rounded-2xl bg-white px-6 py-2 text-lg font-medium text-black transition hover:bg-zinc-200"
+            >
+              Analyze
+            </button>
+          </form>
         </div>
+
       </div>
 
       {/* Spacer for floating search bar */}
@@ -63,7 +84,7 @@ export default function Home() {
 
       {/* Footer */}
       <div className="py-4 text-center text-sm text-zinc-400">
-        <GithubStar/>        
+        <GithubStar />
         <div className="mt-8"> © {new Date().getFullYear()} Replore</div>
       </div>
 

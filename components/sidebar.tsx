@@ -60,7 +60,7 @@ export default function Sidebar({
             <div className="flex h-16 items-center justify-between border-b border-zinc-800 px-5">
                 {!collapsed && (
                     <h1 className="text-lg font-semibold tracking-wide text-white">
-                        REPLORE
+                        Replore
                     </h1>
                 )}
 
