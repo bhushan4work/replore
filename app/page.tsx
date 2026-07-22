@@ -62,9 +62,12 @@ export default function Home() {
       <div className="h-12" />
 
       {/* Footer */}
-      <div className="py-4 text-center text-xs text-zinc-400 dark:border-zinc-800">
-        <div className="mt-1">@2026 bhushan</div>
+      <div className="py-4 text-center text-sm text-zinc-400">
+        <GithubStar/>        
+        <div className="mt-8"> © {new Date().getFullYear()} Replore</div>
       </div>
+
+
     </div>
   );
 }
