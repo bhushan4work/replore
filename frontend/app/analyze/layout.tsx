@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "@/components/sidebar";
+import Sidebar from "@/frontend/components/sidebar";
 
 export default function AnalyzeLayout({
   children,

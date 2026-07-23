@@ -10,6 +10,7 @@ import {
     ChatCircleDots,
     CaretLeft,
     CaretRight,
+    SquaresFour,
 } from "@phosphor-icons/react";
 
 interface SidebarProps {
@@ -19,25 +20,31 @@ interface SidebarProps {
 
 const items = [
     {
-        title: "Architecture",
+        title: "overview",
+        href: "/analyze/overview",
+        icon: SquaresFour,
+        color: "text-[#2563EB]",
+    },
+    {
+        title: "architecture",
         href: "/analyze/architecture",
         icon: Folder,
         color: "text-violet-400",
     },
     {
-        title: "Dependency Graph",
+        title: "dependency graph",
         href: "/analyze/graph",
         icon: GitBranch,
         color: "text-sky-400",
     },
     {
-        title: "Documentation",
+        title: "documentation",
         href: "/analyze/docs",
         icon: Files,
         color: "text-orange-400",
     },
     {
-        title: "AI Chat",
+        title: "ai chat",
         href: "/analyze/chat",
         icon: ChatCircleDots,
         color: "text-emerald-400",
@@ -60,7 +67,7 @@ export default function Sidebar({
             <div className="flex h-16 items-center justify-between border-b border-zinc-800 px-5">
                 {!collapsed && (
                     <h1 className="text-lg font-semibold tracking-wide text-white">
-                        Replore
+                        replore
                     </h1>
                 )}
 
@@ -76,8 +83,8 @@ export default function Sidebar({
                 </button>
             </div>
 
-            {/* Navigation */}
 
+            {/* Navigation */}
             <nav className="mt-4 flex-1 px-3">
                 <div className="space-y-2">
                     {items.map(({ title, href, icon: Icon, color }) => {
@@ -87,7 +94,7 @@ export default function Sidebar({
                             <Link
                                 key={href}
                                 href={href}
-                                className={`group flex items-center rounded-xl px-3 py-3 transition-all
+                                className={`group flex items-center rounded-xl px-3 py-1 transition-all
 
                 ${active
                                         ? "bg-zinc-900"

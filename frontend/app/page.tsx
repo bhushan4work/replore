@@ -49,7 +49,7 @@ export default function Home() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              router.push("/analyze/docs");
+              router.push("/analyze/overview");
             }}
             className="flex items-center gap-3"
           >
