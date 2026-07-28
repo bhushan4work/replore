@@ -100,7 +100,7 @@ export default function Pricing() {
         </Card>
 
         {/* PRO */}
-        <Card className="flex h-full flex-col border border-zinc-800 bg-zinc-950">
+        <Card className="relative flex h-full flex-col border border-zinc-800 bg-zinc-950">
           <Badge className="absolute right-5 top-5 bg-violet-600 hover:bg-violet-600">
             Most Popular
           </Badge>
