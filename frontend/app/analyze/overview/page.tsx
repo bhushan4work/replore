@@ -1,4 +1,4 @@
-import RepoOverview from "@/frontend/components/repo-overview";
+import RepoOverview from "@/components/repo-overview";
 
 export default function Page() {
   return (

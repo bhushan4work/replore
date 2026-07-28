@@ -2,15 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
-import { GithubStar } from "@/components/github-star";
+//import { GithubStar } from "@/components/github-star";
+import Footer from "@/components/footer";
+import Pricing from "@/components/pricing";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 
 export default function Home() {
   const router = useRouter();
   return (
-    <div className="relative min-h-screen bg-zinc-50 font-[family-name:var(--font-geist-sans)] dark:bg-zinc-950">
+    <div className="relative min-h-screen font-[family-name:var(--font-geist-sans)] bg-zinc-950">
       {/* Hero with Warp shader */}
-      <div className="relative h-[500px] overflow-hidden bg-white dark:bg-zinc-900">
+      <div className="relative h-[600px] overflow-hidden bg-zinc-900">
         {/* Shader background */}
         <div className="absolute inset-0">
           <Warp
@@ -33,17 +35,16 @@ export default function Home() {
         <div className="absolute inset-x-0 bottom-28 z-10 px-4 text-center"></div>
 
         {/* Title + Tagline */}
-        <div className="absolute inset-x-0 bottom-28 z-10 px-4 text-center">
-          <h1 className="font-[family-name:var(--font-instrument-serif)] text-5xl tracking-tight text-white drop-shadow-lg sm:text-7xl">
+        <div className="absolute mb-4 inset-x-0 bottom-28 z-10 px-4 text-center">
+          <h1 className="font-[family-name:var(--font-instrument-serif)] text-5xl tracking-tight text-white drop-shadow-lg underline sm:text-8xl">
             Replore
           </h1>
 
-          <p className="mx-auto mt-3 max-w-xl text-lg text-white/90 drop-shadow">
+          <p className="mx-auto mt-3 max-w-xl text-xl text-white/90 drop-shadow">
             discover, understand and explore any github repository with ai.
           </p>
         </div>
 
-        {/* Search Bar */}
         {/* Search Bar */}
         <div className="absolute bottom-10 left-1/2 z-20 w-full max-w-xl -translate-x-1/2 px-4">
           <form
@@ -63,14 +64,14 @@ export default function Home() {
               <input
                 type="text"
                 placeholder="https://github.com/repo-name"
-                className="w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-4 text-sm text-white placeholder-zinc-400 outline-none shadow-2xl"
+                className="w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-4 text-md text-white placeholder-zinc-400 outline-none shadow-2xl"
               />
             </div>
 
             {/* Analyze Button */}
             <button
               type="submit"
-              className="cursor-pointer rounded-2xl bg-white px-6 py-2 text-lg font-medium text-black transition hover:bg-zinc-200"
+              className="cursor-pointer rounded-2xl bg-white px-6 py-3 text-lg font-medium text-black transition hover:bg-zinc-200"
             >
               Analyze
             </button>
@@ -79,14 +80,18 @@ export default function Home() {
 
       </div>
 
+           <Pricing/>
+
       {/* Spacer for floating search bar */}
-      <div className="h-12" />
+      {/* Space between Hero and Footer */}
+      <div className="h-24 bg-zinc-950" />
 
       {/* Footer */}
-      <div className="py-4 text-center text-sm text-zinc-400">
+      <Footer />
+      {/* <div className="py-4 text-center text-sm text-zinc-400">
         <GithubStar />
         <div className="mt-8"> © {new Date().getFullYear()} Replore</div>
-      </div>
+      </div> */}
 
 
     </div>
