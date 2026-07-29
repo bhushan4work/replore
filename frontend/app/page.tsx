@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
 //import { GithubStar } from "@/components/github-star";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar";
+import DemoShowcase from "@/components/demo-showcase";
 import Pricing from "@/components/pricing";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 
@@ -11,6 +13,7 @@ export default function Home() {
   const router = useRouter();
   return (
     <div className="relative min-h-screen font-[family-name:var(--font-geist-sans)] bg-zinc-950">
+      <Navbar/>
       {/* Hero with Warp shader */}
       <div className="relative h-[600px] overflow-hidden bg-zinc-900">
         {/* Shader background */}
@@ -79,6 +82,8 @@ export default function Home() {
         </div>
 
       </div>
+      
+      <DemoShowcase/>
 
            <Pricing/>
 

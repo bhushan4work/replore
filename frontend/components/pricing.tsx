@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/card";
 
 const freeFeatures = [
-  "3 repository analyses / month",
-  "100 AI chat messages",
+  "5 repository analyses / month",
+  "50 AI chat messages",
   "Project overview",
   "Dependency graph",
   "Documentation generation",
@@ -67,7 +67,7 @@ export default function Pricing() {
             </CardTitle>
 
             <div className="mt-4 flex items-end gap-2">
-              <span className="text-6xl font-bold text-white">₹0</span>
+              <span className="text-5xl font-bold text-white">₹0</span>
 
               <span className="mb-2 text-zinc-500">/month</span>
             </div>
@@ -111,8 +111,8 @@ export default function Pricing() {
             </CardTitle>
 
             <div className="mt-4 flex items-end gap-2">
-              <span className="text-6xl font-bold text-white">
-                ₹399
+              <span className="text-5xl font-bold text-white">
+                $9
               </span>
 
               <span className="mb-2 text-zinc-500">/month</span>

@@ -17,7 +17,7 @@ export default function Navbar() {
           mx-auto mt-4
           h-20
           w-[95%]
-          max-w-5xl
+          max-w-6xl
           rounded-full
           border border-white/10
           bg-black/25
