@@ -4,9 +4,9 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[#070707] text-white">
+    <footer className="relative overflow-hidden bg-zinc-950 text-white">
       {/* Content */}
-      <div className="relative z-20 mx-auto max-w-[1750px] px-8 pt-24 pb-[18rem]">
+      <div className="relative z-20 mx-auto max-w-[1750px] px-8 pt-16 pb-[18rem]">
         <div className="flex flex-col gap-16 lg:flex-row mb-24">
           {/* Brand */}
           <div>

@@ -40,12 +40,6 @@ export default function Pricing() {
     >
       {/* Heading */}
       <div className="mx-auto mb-20 max-w-5xl text-center text-xl">
-        <Badge
-          variant="outline"
-          className="border-violet-500/40 bg-violet-500/10 text-violet-300"
-        >
-          Pricing
-        </Badge>
 
         <h2 className="mt-6 text-5xl font-bold tracking-tight text-white md:text-6xl">
           Simple pricing for every developer
