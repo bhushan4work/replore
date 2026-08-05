@@ -2,12 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
-//import { GithubStar } from "@/components/github-star";
+import { GithubStar } from "@/components/github-star";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Features from "@/components/features";
 import DemoShowcase from "@/components/demo-showcase";
-import Pricing from "@/components/pricing";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import FAQSection from "@/components/faq-section";
 
@@ -15,7 +14,7 @@ export default function Home() {
   const router = useRouter();
   return (
     <div className="relative min-h-screen font-[family-name:var(--font-geist-sans)] bg-zinc-950">
-      <Navbar/>
+      <Navbar />
       {/* Hero with Warp shader */}
       <div className="relative h-[600px] overflow-hidden bg-zinc-900">
         {/* Shader background */}
@@ -46,7 +45,8 @@ export default function Home() {
           </h1>
 
           <p className="mx-auto mt-3 max-w-xl text-xl text-white/90 drop-shadow">
-            discover, understand and explore any github repository with ai.
+            turn repository data into actionable engineering insights. <br />
+            analyze faster. ship smarter.
           </p>
         </div>
 
@@ -81,28 +81,26 @@ export default function Home() {
               Analyze
             </button>
           </form>
+
         </div>
 
       </div>
-      
-      <DemoShowcase/>
 
-      <Features/>
 
-      <Pricing/>
+      <div className="py-4 text-center text-sm text-zinc-400 ">
+        <GithubStar />
+      </div>
 
-      <FAQSection/>
+      <DemoShowcase />
+
+      <Features />
+
+      <FAQSection />
 
 
       <div className="h-24 bg-zinc-950" />
 
       <Footer />
-
-      {/* <div className="py-4 text-center text-sm text-zinc-400">
-        <GithubStar />
-        <div className="mt-8"> © {new Date().getFullYear()} Replore</div>
-      </div> */}
-
 
     </div>
   );

@@ -38,7 +38,7 @@ export default function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="w-full py-24 lg:py-32 min-h-screen">
+    <section id="faq" className="w-full py-24 lg:py-32 min-h-screen">
       <div className="mx-auto max-w-[1700px] px-6 md:px-10 xl:px-16">
         <div className="grid items-start gap-16 lg:grid-cols-[420px_1fr]">
           {/* Left Side */}
@@ -103,7 +103,7 @@ export default function FAQSection() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-8 pb-8 pr-24 text-lg leading-8 text-[#6B7280]">
+                      <p className="px-8 pb-6 pr-24 text-lg leading-6 text-[#6B7280]">
                         {faq.answer}
                       </p>
                     </div>

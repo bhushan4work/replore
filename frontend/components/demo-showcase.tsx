@@ -2,7 +2,7 @@
 
 export default function DemoShowcase() {
   return (
-    <section className="mx-auto mt-40 mb-40 w-full max-w-[1350px] px-6">
+    <section id="how-it-works" className="mx-auto mt-40 mb-40 w-full max-w-[1350px] px-6">
       <div
         className="
           rounded-[28px]

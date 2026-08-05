@@ -55,19 +55,19 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="#pricing"
+                href="#faq"
                 className="text-xl text-white/70 transition hover:text-white"
               >
-                Pricing
+                FAQ
               </Link>
             </div>
           </nav>
 
           {/* Right (Desktop) */}
           <div className="hidden flex-1 items-center justify-end gap-3 md:flex">
-            <button className="rounded-full bg-white px-6 py-2 text-xl font-medium text-black transition hover:bg-white/90">
+            <Link href="/signup" className="rounded-full bg-white px-6 py-2 text-xl font-medium text-black transition hover:bg-white/90">
               Get Started
-            </button>
+            </Link>
           </div>
 
           {/* Mobile */}

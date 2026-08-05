@@ -10,7 +10,7 @@ import {
 
 export default function FeaturesSection() {
   return (
-    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-32">
+    <section id="features" className="relative overflow-hidden py-20 sm:py-24 lg:py-32">
       {/* Background Glow */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-violet-500/0 blur-[120px] sm:h-[420px] sm:w-[420px] sm:blur-[150px] lg:h-[500px] lg:w-[500px] lg:blur-[170px]" />

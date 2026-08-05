@@ -35,10 +35,10 @@ export default function Footer() {
                 </Link>
 
                 <Link
-                  href="#pricing"
+                  href="#how-it-works"
                   className="text-2xl transition hover:text-white"
                 >
-                  Pricing
+                  How it Works
                 </Link>
 
                 <Link
@@ -56,21 +56,21 @@ export default function Footer() {
 
               <div className="flex flex-col gap-4 text-white/60">
                 <Link
-                  href="#docs"
+                  href="/"
                   className="text-2xl transition hover:text-white"
                 >
                   Documentation
                 </Link>
 
                 <Link
-                  href="#github"
+                  href="/"
                   className="text-2xl transition hover:text-white"
                 >
                   GitHub
                 </Link>
 
                 <Link
-                  href="#contact"
+                  href="/"
                   className="text-2xl transition hover:text-white"
                 >
                   Contact
@@ -84,14 +84,14 @@ export default function Footer() {
 
               <div className="flex flex-col gap-4 text-white/60">
                 <Link
-                  href="/privacy"
+                  href="/"
                   className="text-2xl transition hover:text-white"
                 >
                   Privacy Policy
                 </Link>
 
                 <Link
-                  href="/terms"
+                  href="/"
                   className="text-2xl transition hover:text-white"
                 >
                   Terms of Service
