@@ -114,7 +114,7 @@ export default function Navbar() {
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-70 border-white/10 bg-zinc-950 text-white"
+                  className="w-70 p-2 border-white/10 bg-zinc-950 text-white"
                 >
                   <div className="border-b border-white/10 px-3 py-2 text-sm text-white/70">
                     {user.email}
