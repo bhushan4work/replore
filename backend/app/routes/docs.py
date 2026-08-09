@@ -10,10 +10,10 @@ router = APIRouter(
     prefix="/api/repositories",
 )
 
-@router.get("/{repository_id}/architecture")
-async def repository_architecture(repository_id: str):
+@router.get("/{repository_id}/docs")
+async def generate_documentation(repository_id: str):
     """
-    Generates an architecture summary for a repository.
+    Generate repository documentation using AI.
     """
 
     repository = (
@@ -43,50 +43,54 @@ async def repository_architecture(repository_id: str):
             detail="Repository directory not found.",
         )
 
-    project_structure = build_project_structure(
+    structure = build_repository_structure(
         repository_path
     )
 
     prompt = f"""
-You are analyzing a GitHub repository.
-
-Generate a concise but detailed architecture overview.
+Generate professional project documentation.
 
 Include:
 
-1. High-level purpose
-2. Folder organization
-3. Main modules
-4. Important technologies
-5. Data flow
-6. Overall architecture pattern
-7. Important observations
+# Project Overview
+
+# Folder Structure
+
+# Technologies Used
+
+# Important Modules
+
+# Installation
+
+# Development Workflow
+
+# Notes
 
 Repository Structure:
 
-{project_structure}
+{structure}
 """
 
-    summary = ai_service.chat(
+    documentation = ai_service.chat(
         question=prompt,
-        context=project_structure,
+        context=structure,
     )
 
     return {
         "repository_id": repository_id,
-        "architecture": summary,
+        "documentation": documentation,
     }
 
 
-def build_project_structure(
+def build_repository_structure(
     root: Path,
 ) -> str:
 
-    lines = []
+    output: list[str] = []
 
     def walk(
         directory: Path,
-        indent: int = 0,
+        depth: int = 0,
     ):
 
         items = sorted(
@@ -102,17 +106,17 @@ def build_project_structure(
             if item.name.startswith(".git"):
                 continue
 
-            lines.append(
-                "    " * indent + item.name
+            output.append(
+                "    " * depth + item.name
             )
 
             if item.is_dir():
 
                 walk(
                     item,
-                    indent + 1,
+                    depth + 1,
                 )
 
     walk(root)
 
-    return "\n".join(lines)
+    return "\n".join(output)
