@@ -21,7 +21,7 @@ export default function Footer() {
           </div>
 
           {/* Right Side */}
-          <div className="ml-auto flex gap-16 xl:gap-60">
+          <div className="ml-auto flex gap-20 xl:gap-60">
             {/* Product */}
             <div>
               <h3 className="mb-7 text-2xl font-semibold">Product</h3>
@@ -115,12 +115,12 @@ export default function Footer() {
             tracking-[-0.09em]
 
             text-[10rem]
-            sm:text-[14rem]
+            sm:text-[12rem]
             md:text-[18rem]
             lg:text-[24rem]
             xl:text-[28rem]
 
-            translate-y-[22%]
+            translate-y-[10%]
           "
           style={{
             background:

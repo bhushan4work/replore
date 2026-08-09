@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
 import { GithubStar } from "@/components/github-star";
@@ -8,10 +9,74 @@ import Navbar from "@/components/navbar";
 import Features from "@/components/features";
 import DemoShowcase from "@/components/demo-showcase";
 import { MagnifyingGlass } from "@phosphor-icons/react";
+import { CircleAlert, Loader2 } from "lucide-react";
 import FAQSection from "@/components/faq-section";
+
+const GITHUB_REPO_REGEX =
+  /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/;
 
 export default function Home() {
   const router = useRouter();
+  const [repoUrl, setRepoUrl] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const trimmed = repoUrl.trim();
+
+    if (!trimmed) {
+      setError("Paste a repository link to get started.");
+      return;
+    }
+
+    if (!GITHUB_REPO_REGEX.test(trimmed)) {
+      setError(
+        "Please enter a valid GitHub repository URL"
+      );
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const match = trimmed.match(
+        /^https?:\/\/(www\.)?github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)/
+      );
+      const owner = match?.[2];
+      const repo = match?.[3];
+
+      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
+
+      if (res.status === 200) {
+        router.push("/analyze");
+        return;
+      }
+
+      if (res.status === 404) {
+        setError("Repository not found. Please try again.");
+        return;
+      }
+
+      if (res.status === 403) {
+        setError(
+          "This repository is private or you've hit rate limits. Please try again later."
+        );
+        return;
+      }
+
+      setError("Unable to validate repository. Please try again.");
+    } catch {
+      setError("Unable to validate repository. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen font-[family-name:var(--font-geist-sans)] bg-zinc-950">
       <Navbar />
@@ -53,10 +118,8 @@ export default function Home() {
         {/* Search Bar */}
         <div className="absolute bottom-10 left-1/2 z-20 w-full max-w-xl -translate-x-1/2 px-4">
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              router.push("/analyze/overview");
-            }}
+            onSubmit={handleSubmit}
+            noValidate
             className="flex items-center gap-3"
           >
             {/* Input */}
@@ -68,20 +131,46 @@ export default function Home() {
 
               <input
                 type="text"
+                value={repoUrl}
+                onChange={(e) => {
+                  setRepoUrl(e.target.value);
+                  if (error) setError("");
+                }}
                 placeholder="https://github.com/repo-name"
-                className="w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-4 text-md text-white placeholder-zinc-400 outline-none shadow-2xl"
+                aria-invalid={!!error}
+                aria-describedby={error ? "repo-error" : undefined}
+                className={`w-full rounded-2xl bg-neutral-900 py-4 pl-12 pr-4 text-md text-white placeholder-zinc-400 outline-none shadow-2xl ${error ? "ring-2 ring-red-500" : ""
+                  }`}
               />
+
+              {error && (
+                <p
+                  id="repo-error"
+                  role="alert"
+                  className="absolute left-0 top-full z-30 mt-2 flex w-full items-start gap-1.5 text-sm text-red-400"
+                >
+                  <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </p>
+              )}
             </div>
 
             {/* Analyze Button */}
             <button
               type="submit"
-              className="cursor-pointer rounded-2xl bg-white px-6 py-3 text-lg font-medium text-black transition hover:bg-zinc-200"
+              disabled={isLoading}
+              className="flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl bg-white px-6 py-3 text-lg font-medium text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Analyze
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Checking...
+                </>
+              ) : (
+                "Analyze"
+              )}
             </button>
           </form>
-
         </div>
 
       </div>

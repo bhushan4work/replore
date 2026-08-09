@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${instrumentSerif.variable}`}
+      className={`dark ${inter.variable} ${instrumentSerif.variable}`}
     >
       <body className="font-sans antialiased">
         {children}

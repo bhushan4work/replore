@@ -42,7 +42,7 @@ export default function FAQSection() {
       <div className="mx-auto max-w-[1700px] px-6 md:px-10 xl:px-16">
         <div className="grid items-start gap-16 lg:grid-cols-[420px_1fr]">
           {/* Left Side */}
-        <div className="self-start lg:sticky lg:top-32 min-h-[700px] ">
+        <div className="self-start lg:sticky lg:top-32 lg:min-h-[700px] ">
             <p className="mb-6 text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
               FAQs
             </p>
@@ -86,7 +86,7 @@ export default function FAQSection() {
                       {faq.question}
                     </span>
 
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#F5F5F5] transition-transform duration-300">
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-black transition-transform duration-300">
                       {active ? (
                         <Minus className="h-5 w-5" strokeWidth={2.5} />
                       ) : (

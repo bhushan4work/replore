@@ -184,3 +184,7 @@
     @apply font-sans;
   }
 }
+
+html {
+  scrollbar-gutter: stable;
+}
