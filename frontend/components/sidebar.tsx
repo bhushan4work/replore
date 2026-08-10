@@ -18,34 +18,34 @@ interface SidebarProps {
     onToggle: () => void;
 }
 
-const items = [
+const ITEM_DEFS = [
     {
         title: "overview",
-        href: "/analyze/overview",
+        slug: "overview",
         icon: SquaresFour,
         color: "text-[#2563EB]",
     },
     {
         title: "architecture",
-        href: "/analyze/architecture",
+        slug: "architecture",
         icon: Folder,
         color: "text-violet-400",
     },
     {
         title: "dependency graph",
-        href: "/analyze/graph",
+        slug: "graph",
         icon: GitBranch,
         color: "text-sky-400",
     },
     {
         title: "documentation",
-        href: "/analyze/docs",
+        slug: "docs",
         icon: Files,
         color: "text-orange-400",
     },
     {
         title: "ai chat",
-        href: "/analyze/chat",
+        slug: "chat",
         icon: ChatCircleDots,
         color: "text-emerald-400",
     },
@@ -56,6 +56,15 @@ export default function Sidebar({
     onToggle,
 }: SidebarProps) {
     const pathname = usePathname();
+
+    const repositoryId = pathname.split("/")[2] ?? "";
+
+    const items = ITEM_DEFS.map(({ title, slug, icon, color }) => ({
+        title,
+        href: `/analyze/${repositoryId}/${slug}`,
+        icon,
+        color,
+    }));
 
     return (
         <aside

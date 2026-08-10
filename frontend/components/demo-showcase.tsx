@@ -14,13 +14,11 @@ export default function DemoShowcase() {
         {/* 0.5cm ≈ 18-20px padding */}
         <div className="p-5">
           <div className="overflow-hidden rounded-[18px] bg-black">
-            <video
-              className="aspect-video h-full w-full object-cover"
-              src="/demo/demo.mp4"
-              controls
-              playsInline
-              preload="metadata"
-            />
+            <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-800">
+              <span className="text-sm text-neutral-500">
+                Demo video coming soon
+              </span>
+            </div>
           </div>
         </div>
       </div>

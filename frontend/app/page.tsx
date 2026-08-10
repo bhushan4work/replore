@@ -11,6 +11,7 @@ import DemoShowcase from "@/components/demo-showcase";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { CircleAlert, Loader2 } from "lucide-react";
 import FAQSection from "@/components/faq-section";
+import { createAnalysisJob } from "@/lib/api";
 
 const GITHUB_REPO_REGEX =
   /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/;
@@ -42,36 +43,15 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const match = trimmed.match(
-        /^https?:\/\/(www\.)?github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)/
+      const job = await createAnalysisJob(trimmed);
+
+      router.push(`/analyze/progress?job_id=${job.job_id}`);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to start the analysis. Please try again."
       );
-      const owner = match?.[2];
-      const repo = match?.[3];
-
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-        headers: { Accept: "application/vnd.github+json" },
-      });
-
-      if (res.status === 200) {
-        router.push("/analyze");
-        return;
-      }
-
-      if (res.status === 404) {
-        setError("Repository not found. Please try again.");
-        return;
-      }
-
-      if (res.status === 403) {
-        setError(
-          "This repository is private or you've hit rate limits. Please try again later."
-        );
-        return;
-      }
-
-      setError("Unable to validate repository. Please try again.");
-    } catch {
-      setError("Unable to validate repository. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -164,7 +144,7 @@ export default function Home() {
               {isLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Checking...
+                  Starting...
                 </>
               ) : (
                 "Analyze"
