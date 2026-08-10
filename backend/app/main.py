@@ -7,12 +7,17 @@ from app.config import settings
 
 # Routers
 from app.routes.repositories import router as repositories_router
+from app.routes.analyze import router as analyze_router
 from app.routes.architecture import router as architecture_router
 from app.routes.chat import router as chat_router
 from app.routes.docs import router as docs_router
 from app.routes.graph import router as graph_router
 from app.routes.overview import router as overview_router
 from app.routes.auth import router as auth_router
+
+# Jobs
+from app.jobs import analysis_job
+from app.services.github import github_service
 
 
 @asynccontextmanager
@@ -22,6 +27,9 @@ async def lifespan(app: FastAPI):
     """
 
     print("Starting replore Backend...")
+
+    analysis_job.fail_stale_jobs()
+    github_service.cleanup_stale_temp_dirs()
 
     yield
 
@@ -46,6 +54,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.FRONTEND_URL],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,6 +92,8 @@ app.include_router(
     prefix="/api/repositories",
     tags=["Repositories"],
 )
+
+app.include_router(analyze_router)
 app.include_router(overview_router, tags=["Overview"])
 
 app.include_router(architecture_router, tags=["Architecture"])

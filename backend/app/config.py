@@ -11,7 +11,7 @@ ROOT_DIR = BASE_DIR.parent
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=ROOT_DIR / ".env",
+        env_file=BASE_DIR / ".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -54,6 +54,16 @@ class Settings(BaseSettings):
     GITHUB_TOKEN: str
 
     # -------------------------------------------------
+    # Clone Hardening
+    # -------------------------------------------------
+    # git aborts the clone if the transfer stays below the low-speed
+    # limit for the given number of seconds.
+
+    CLONE_LOW_SPEED_LIMIT_BPS: int = 1000
+    CLONE_LOW_SPEED_TIME_SECONDS: int = 60
+    CLONE_RETRY_ATTEMPTS: int = 3
+
+    # -------------------------------------------------
     # Repository Storage
     # -------------------------------------------------
 
@@ -65,6 +75,38 @@ class Settings(BaseSettings):
 
     CHUNK_SIZE: int = 1200
     CHUNK_OVERLAP: int = 200
+
+    # -------------------------------------------------
+    # Embedding
+    # -------------------------------------------------
+    # Chunks are embedded in batches of EMBED_BATCH_SIZE and each batch
+    # is retried EMBED_RETRY_ATTEMPTS times before individual fallback.
+
+    EMBED_BATCH_SIZE: int = 16
+    EMBED_RETRY_ATTEMPTS: int = 3
+    EMBED_TIMEOUT_SECONDS: int = 60
+
+    # -------------------------------------------------
+    # Retrieval & Chat
+    # -------------------------------------------------
+    # RAG keeps the prompt within practical LLM limits: RAG_TOP_K chunks
+    # are retrieved per question, MAX_CONTEXT_CHARS caps the combined
+    # context sent to the model, and transient LLM failures are retried
+    # LLM_RETRY_ATTEMPTS times.
+
+    RAG_TOP_K: int = 8
+    MAX_CONTEXT_CHARS: int = 12000
+    LLM_RETRY_ATTEMPTS: int = 3
+
+    # -------------------------------------------------
+    # Scanning Limits
+    # -------------------------------------------------
+    # Keeps analysis safe on large repositories. Files/directories
+    # that exceed these limits are skipped instead of failing the job.
+
+    MAX_REPOSITORY_SIZE_MB: int = 150
+    MAX_FILE_SIZE_KB: int = 512
+    MAX_FILE_COUNT: int = 5000
 
     # -------------------------------------------------
     # Frontend

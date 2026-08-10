@@ -5,6 +5,9 @@ import re
 
 import networkx as nx
 
+from app.config import settings
+from app.services.parser import IGNORE_DIRECTORIES
+
 
 class GraphService:
     """
@@ -53,6 +56,12 @@ class GraphService:
             if not file.is_file():
                 continue
 
+            if any(
+                part in IGNORE_DIRECTORIES
+                for part in file.parts
+            ):
+                continue
+
             suffix = file.suffix.lower()
 
             if suffix not in {
@@ -62,6 +71,14 @@ class GraphService:
                 ".ts",
                 ".tsx",
             }:
+                continue
+
+            try:
+
+                if file.stat().st_size > settings.MAX_FILE_SIZE_KB * 1024:
+                    continue
+
+            except OSError:
                 continue
 
             try:

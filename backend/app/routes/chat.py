@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -5,6 +7,7 @@ from app.database import supabase
 from app.services.ai import ai_service
 from app.services.rag import rag_service
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/api/repositories",
@@ -25,7 +28,7 @@ async def repository_chat(
     repository = (
         supabase.table("repositories")
         .select("*")
-        .eq("id", request.repository_id)
+        .eq("id", repository_id)
         .single()
         .execute()
     )
@@ -36,24 +39,68 @@ async def repository_chat(
             detail="Repository not found.",
         )
 
-    context = rag_service.search(
-        request.repository_id,
-        request.question,
-    )
+    try:
+
+        chunks = rag_service.retrieve(
+            repository_id,
+            request.question,
+        )
+
+    except Exception as exc:
+
+        logger.exception(
+            "RAG retrieval failed for repository %s.",
+            repository_id,
+        )
+
+        return {
+            "repository_id": repository_id,
+            "question": request.question,
+            "answer": (
+                "I couldn't retrieve repository context right now. "
+                "Please try again."
+            ),
+        }
+
+    context = rag_service.build_context(chunks)
 
     if not context:
 
         return {
-            "answer": "I couldn't find any relevant context inside this repository for your question."
+            "repository_id": repository_id,
+            "question": request.question,
+            "answer": (
+                "I couldn't find relevant information in this repository "
+                "for your question. The repository may not provide enough "
+                "information to answer it."
+            ),
         }
 
-    answer = ai_service.chat(
-        question=request.question,
-        context=context,
-    )
+    try:
+
+        answer = ai_service.chat(
+            question=request.question,
+            context=context,
+        )
+
+    except Exception as exc:
+
+        logger.exception(
+            "LLM chat failed for repository %s.",
+            repository_id,
+        )
+
+        return {
+            "repository_id": repository_id,
+            "question": request.question,
+            "answer": (
+                "I'm having trouble reaching the language model right now. "
+                "Please try again."
+            ),
+        }
 
     return {
-        "repository_id": request.repository_id,
+        "repository_id": repository_id,
         "question": request.question,
         "answer": answer,
     }
