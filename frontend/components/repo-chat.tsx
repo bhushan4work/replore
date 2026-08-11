@@ -151,7 +151,7 @@ export default function RepoChat({
   };
 
   return (
-    <div className="flex h-screen flex-col bg-[#0a0a0a] text-white">
+    <div className="flex h-screen flex-col px-52 bg-[#0a0a0a] text-white">
       {/* Message list */}
       <div
         ref={scrollRef}
@@ -197,7 +197,7 @@ export default function RepoChat({
         onSubmit={handleSubmit}
         className="border-t border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 sm:px-8"
       >
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
+        <div className="mx-auto flex max-w-2xl items-center gap-3">
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}

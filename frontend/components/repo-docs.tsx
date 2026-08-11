@@ -127,38 +127,7 @@ export default function RepoDocs({ markdown, title }: RepoDocsProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <div className="mx-auto flex max-w-7xl gap-8 px-6 py-10">
-        {/* Table of contents */}
-        <aside className="sticky top-0 hidden h-screen w-[250px] shrink-0 self-start overflow-y-auto rounded-xl border border-[#2a2a2a] bg-[#111] p-3 lg:block">
-          <p className="px-3 pb-3 pt-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            On this page
-          </p>
-
-          <nav className="space-y-0.5">
-            {toc.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className={`w-full rounded-md border-l-2 py-1.5 pr-2 text-left text-sm transition ${
-                  activeId === item.id
-                    ? "border-violet-500 text-white"
-                    : "border-transparent text-gray-400 hover:text-gray-200"
-                }`}
-                style={{
-                  paddingLeft: item.level === 3 ? "2.5rem" : "0.875rem",
-                }}
-              >
-                <span
-                  className={
-                    item.level === 3 ? "text-xs" : "text-sm font-medium"
-                  }
-                >
-                  {item.text}
-                </span>
-              </button>
-            ))}
-          </nav>
-        </aside>
+      <div className="mx-auto flex max-w-8xl gap-8 px-6 py-10">
 
         {/* Content */}
         <section className="min-w-0 flex-1">
@@ -173,7 +142,7 @@ export default function RepoDocs({ markdown, title }: RepoDocsProps) {
             </button>
           </div>
 
-          <article className="prose prose-invert prose-zinc mx-auto max-w-3xl">
+          <article className="prose prose-invert prose-zinc mx-auto max-w-7xl">
             <ReactMarkdown
               components={{
                 h2: ({ children }) => (

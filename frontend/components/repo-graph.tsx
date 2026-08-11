@@ -73,7 +73,6 @@ function GraphNode({ data }: NodeProps<Node<GraphNodeData>>) {
   return (
     <div
       className="relative rounded-xl border border-[#2a2a2a] bg-[#161616] px-4 py-3 shadow-lg shadow-black/40"
-      style={{ borderLeft: `3px solid ${color}` }}
     >
       <div className="flex items-center gap-2">
         <span

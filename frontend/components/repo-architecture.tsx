@@ -113,8 +113,7 @@ function ModuleCard({
                 {module.dependsOn.map((dep) => (
                   <span
                     key={dep}
-                    className="rounded-md border-l-2 bg-[#222] px-2.5 py-1 text-xs text-gray-300"
-                    style={{ borderColor: module.color }}
+                    className="rounded-md bg-[#222] px-2.5 py-1 text-xs text-gray-300"
                   >
                     {dep}
                   </span>
@@ -133,7 +132,7 @@ export default function RepoArchitecture({
 }: RepoArchitectureProps) {
   return (
     <div className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-      <div className="mx-auto max-w-5xl space-y-3">
+      <div className="mx-auto max-w-7xl space-y-3">
         {modules.map((module, index) => (
           <ModuleCard
             key={module.id}
