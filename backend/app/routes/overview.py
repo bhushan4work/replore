@@ -52,6 +52,10 @@ async def get_repository_overview(repository_id: str):
         repository_path
     )
 
+    statistics["contributors"] = (
+        github_service.count_contributors(repository_path)
+    )
+
     dependency_files = [
         str(file.relative_to(repository_path))
         for file in parser_service.dependency_files(

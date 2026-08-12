@@ -114,6 +114,11 @@ class GitHubService:
             "forks": repo.forks_count,
             "open_issues": repo.open_issues_count,
             "clone_url": repo.clone_url,
+            "pushed_at": (
+                repo.pushed_at.isoformat()
+                if repo.pushed_at
+                else None
+            ),
         }
 
     def get_head_commit_sha(self, repo_url: str) -> str | None:
@@ -255,6 +260,18 @@ class GitHubService:
     @staticmethod
     def repository_exists(path: Path) -> bool:
         return path.exists()
+
+    @staticmethod
+    def count_contributors(path: Path) -> int:
+        """Number of unique committers in the local clone's history."""
+        try:
+            return len(
+                Repo(path)
+                .git.shortlog("-sn", "--all")
+                .splitlines()
+            )
+        except Exception:
+            return 0
 
 
 github_service = GitHubService()
