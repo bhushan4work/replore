@@ -15,7 +15,6 @@ import {
   type NodeProps,
   type NodeTypes,
 } from "@xyflow/react";
-import { X } from "@phosphor-icons/react";
 import "@xyflow/react/dist/style.css";
 
 // ---------------------------------------------------------
@@ -101,105 +100,10 @@ function GraphNode({ data }: NodeProps<Node<GraphNodeData>>) {
 const nodeTypes: NodeTypes = { graph: GraphNode };
 
 // ---------------------------------------------------------
-// Slide-in detail panel
-// ---------------------------------------------------------
-
-function DetailPanel({
-  node,
-  onClose,
-}: {
-  node: GraphNodeData | null;
-  onClose: () => void;
-}) {
-  const open = node !== null;
-
-  return (
-    <div
-      className={`absolute bottom-0 right-0 top-0 z-10 w-[320px] border-l border-[#2a2a2a] bg-[#161616] transition-transform duration-300 ${
-        open ? "translate-x-0" : "translate-x-full"
-      } ${open ? "pointer-events-auto" : "pointer-events-none"}`}
-      aria-hidden={!open}
-    >
-      {node && (
-        <div className="flex h-full flex-col">
-          <div className="flex items-start justify-between border-b border-[#2a2a2a] px-5 py-4">
-            <div className="min-w-0">
-              <h3 className="truncate text-base font-semibold text-white">
-                {node.label}
-              </h3>
-              <p className="mt-1 truncate font-mono text-xs text-gray-400">
-                {node.filePath}
-              </p>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="ml-3 shrink-0 rounded-md p-1.5 text-gray-400 transition hover:bg-white/5 hover:text-white"
-              aria-label="Close"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
-            <section>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Imports
-              </h4>
-
-              {node.imports.length > 0 ? (
-                <ul className="mt-2.5 space-y-1.5">
-                  {node.imports.map((item) => (
-                    <li
-                      key={item}
-                      className="font-mono text-sm text-gray-300"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2.5 text-sm text-gray-500">
-                  No imports.
-                </p>
-              )}
-            </section>
-
-            <section>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Exports
-              </h4>
-
-              {node.exports.length > 0 ? (
-                <ul className="mt-2.5 space-y-1.5">
-                  {node.exports.map((item) => (
-                    <li
-                      key={item}
-                      className="font-mono text-sm text-gray-300"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2.5 text-sm text-gray-500">
-                  No exports.
-                </p>
-              )}
-            </section>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------
 // Graph
 // ---------------------------------------------------------
 
 export default function RepoGraph({ nodes, edges }: RepoGraphProps) {
-  const [selected, setSelected] = useState<GraphNodeData | null>(null);
   const [hoveredEdges, setHoveredEdges] = useState<Set<string>>(
     () => new Set()
   );
@@ -244,15 +148,6 @@ export default function RepoGraph({ nodes, edges }: RepoGraphProps) {
     [edges, hoveredEdges]
   );
 
-  const onNodeClick = useCallback(
-    (_: React.MouseEvent, node: Node) => {
-      setSelected(node.data as GraphNodeData);
-    },
-    []
-  );
-
-  const onPaneClick = useCallback(() => setSelected(null), []);
-
   const onEdgeMouseEnter = useCallback(
     (_: React.MouseEvent, edge: Edge) => {
       setHoveredEdges((prev) => new Set(prev).add(edge.id));
@@ -279,8 +174,7 @@ export default function RepoGraph({ nodes, edges }: RepoGraphProps) {
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
-        onNodeClick={onNodeClick}
-        onPaneClick={onPaneClick}
+        proOptions={{ hideAttribution: true }}
         onEdgeMouseEnter={onEdgeMouseEnter}
         onEdgeMouseLeave={onEdgeMouseLeave}
         defaultEdgeOptions={{ type: "default" }}
@@ -307,11 +201,6 @@ export default function RepoGraph({ nodes, edges }: RepoGraphProps) {
           }
         />
       </ReactFlow>
-
-      <DetailPanel
-        node={selected}
-        onClose={() => setSelected(null)}
-      />
     </div>
   );
 }

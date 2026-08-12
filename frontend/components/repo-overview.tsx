@@ -109,7 +109,7 @@ export default function RepoOverview({
 }: RepoOverviewProps) {
   return (
     <div className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-      <div className="mx-auto max-w-7xl space-y-8">
+      <div className="mx-auto max-7xl space-y-8">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-4">
           <h1 className="mr-2 text-4xl font-bold">{repoName}</h1>

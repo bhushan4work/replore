@@ -89,3 +89,146 @@ export async function getAnalysisJobStatus(
 
   return res.json();
 }
+
+export interface OverviewDirectoryNode {
+  name: string;
+  type: "directory" | "file";
+  children?: OverviewDirectoryNode[];
+}
+
+export interface RepositoryOverview {
+  repository: {
+    id: number;
+    name: string;
+    full_name: string;
+    description: string | null;
+    owner: string;
+    default_branch: string;
+    language: string | null;
+    stars: number;
+    forks: number;
+    open_issues: number;
+    clone_url: string;
+    pushed_at: string | null;
+  };
+  statistics: {
+    files: number;
+    lines: number;
+    languages: Record<string, number>;
+    contributors: number;
+  };
+  dependency_files: string[];
+  directory_tree: OverviewDirectoryNode[];
+}
+
+export async function getRepositoryOverview(
+  repositoryId: string
+): Promise<RepositoryOverview> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/overview`
+  );
+
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+
+  return res.json();
+}
+
+export interface RepositoryArchitecture {
+  repository_id: string;
+  architecture: string;
+}
+
+export async function getRepositoryArchitecture(
+  repositoryId: string
+): Promise<RepositoryArchitecture> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/architecture`
+  );
+
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+
+  return res.json();
+}
+
+export interface RepositoryGraphNode {
+  id: string;
+  data: { label: string };
+  position: { x: number; y: number };
+}
+
+export interface RepositoryGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+}
+
+export interface RepositoryGraph {
+  repository_id: string;
+  graph: {
+    nodes: RepositoryGraphNode[];
+    edges: RepositoryGraphEdge[];
+  };
+}
+
+export async function getRepositoryGraph(
+  repositoryId: string
+): Promise<RepositoryGraph> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/graph`
+  );
+
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+
+  return res.json();
+}
+
+export interface RepositoryDocs {
+  repository_id: string;
+  documentation: string;
+}
+
+export async function getRepositoryDocs(
+  repositoryId: string
+): Promise<RepositoryDocs> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/docs`
+  );
+
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+
+  return res.json();
+}
+
+export interface ChatResponse {
+  repository_id: string;
+  question: string;
+  answer: string;
+}
+
+export async function sendChatMessage(
+  repositoryId: string,
+  question: string
+): Promise<ChatResponse> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/chat`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    }
+  );
+
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+
+  return res.json();
+}

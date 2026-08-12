@@ -1,96 +1,72 @@
 import RepoGraph from "@/components/repo-graph";
+import {
+  ApiError,
+  getRepositoryGraph,
+  type RepositoryGraphNode,
+} from "@/lib/api";
 
-export default function GraphPage() {
+function GraphError({ message }: { message: string }) {
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] p-6 text-white">
+      <div className="mx-auto max-w-7xl rounded-2xl border border-[#2a2a2a] bg-[#161616] p-8">
+        <h1 className="text-xl font-semibold">Unable to load dependency graph</h1>
+        <p className="mt-2 text-sm text-gray-400">{message}</p>
+      </div>
+    </div>
+  );
+}
+
+function toRepoGraphNode(
+  node: RepositoryGraphNode
+): {
+  id: string;
+  label: string;
+  filePath: string;
+  group: string;
+  imports: string[];
+  exports: string[];
+  position: { x: number; y: number };
+} {
+  const parts = node.id.replace(/\\/g, "/").split("/").filter(Boolean);
+
+  return {
+    id: node.id,
+    label: parts[parts.length - 1] ?? node.id,
+    filePath: node.id,
+    group: parts.length > 1 ? parts[0] : "root",
+    imports: [],
+    exports: [],
+    position: node.position,
+  };
+}
+
+export default async function GraphPage({
+  params,
+}: {
+  params: Promise<{ repositoryId: string }>;
+}) {
+  const { repositoryId } = await params;
+
+  let graph;
+
+  try {
+    graph = await getRepositoryGraph(repositoryId);
+  } catch (err) {
+    return (
+      <GraphError
+        message={
+          err instanceof ApiError
+            ? err.message
+            : "The backend could not be reached. Make sure it is running."
+        }
+      />
+    );
+  }
+
   return (
     <RepoGraph
-      nodes={[
-        {
-          id: "page",
-          label: "page.tsx",
-          filePath: "src/app/page.tsx",
-          group: "src",
-          imports: ["createAnalysisJob", "GITHUB_REPO_REGEX"],
-          exports: ["Home"],
-          position: { x: 0, y: 240 },
-        },
-        {
-          id: "layout",
-          label: "layout.tsx",
-          filePath: "src/app/analyze/[repositoryId]/layout.tsx",
-          group: "src",
-          imports: ["Sidebar", "useState"],
-          exports: ["AnalyzeLayout"],
-          position: { x: 0, y: 0 },
-        },
-        {
-          id: "progress",
-          label: "analysis-progress.tsx",
-          filePath: "src/components/analysis-progress.tsx",
-          group: "components",
-          imports: ["createAnalysisJob", "getAnalysisJobStatus"],
-          exports: ["AnalysisProgress"],
-          position: { x: 520, y: 0 },
-        },
-        {
-          id: "overview",
-          label: "repo-overview.tsx",
-          filePath: "src/components/repo-overview.tsx",
-          group: "components",
-          imports: [],
-          exports: ["RepoOverview", "RepoOverviewProps"],
-          position: { x: 520, y: 180 },
-        },
-        {
-          id: "architecture",
-          label: "repo-architecture.tsx",
-          filePath: "src/components/repo-architecture.tsx",
-          group: "components",
-          imports: [],
-          exports: ["RepoArchitecture", "ArchitectureModule"],
-          position: { x: 520, y: 360 },
-        },
-        {
-          id: "docs",
-          label: "repo-docs.tsx",
-          filePath: "src/components/repo-docs.tsx",
-          group: "components",
-          imports: ["ReactMarkdown"],
-          exports: ["RepoDocs"],
-          position: { x: 520, y: 540 },
-        },
-        {
-          id: "sidebar",
-          label: "sidebar.tsx",
-          filePath: "src/components/sidebar.tsx",
-          group: "components",
-          imports: ["usePathname"],
-          exports: ["Sidebar"],
-          position: { x: 1040, y: 120 },
-        },
-        {
-          id: "api",
-          label: "api.ts",
-          filePath: "src/lib/api.ts",
-          group: "lib",
-          imports: [],
-          exports: [
-            "createAnalysisJob",
-            "getAnalysisJobStatus",
-            "AnalysisJob",
-            "ApiError",
-          ],
-          position: { x: 1040, y: 300 },
-        },
-      ]}
-      edges={[
-        { id: "e-layout-sidebar", source: "layout", target: "sidebar" },
-        { id: "e-page-progress", source: "page", target: "progress" },
-        { id: "e-page-overview", source: "page", target: "overview" },
-        { id: "e-page-architecture", source: "page", target: "architecture" },
-        { id: "e-page-docs", source: "page", target: "docs" },
-        { id: "e-progress-api", source: "progress", target: "api" },
-        { id: "e-page-api", source: "page", target: "api" },
-      ]}
+      nodes={graph.graph.nodes.map(toRepoGraphNode)}
+      edges={graph.graph.edges}
     />
   );
 }
