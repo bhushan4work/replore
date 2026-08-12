@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator
@@ -868,9 +869,15 @@ class ParserService:
 
         language_count: dict[str, int] = {}
 
+        file_type_count: dict[str, int] = {}
+
         total_lines = 0
 
+        blank_lines = 0
+
         file_count = 0
+
+        largest_files: list[dict] = []
 
         for file in self.iter_source_files(repository):
 
@@ -884,15 +891,71 @@ class ParserService:
                 + 1
             )
 
-            total_lines += len(
-                file.content.splitlines()
+            extension = (
+                Path(file.path).suffix.lower()
+                or "no extension"
             )
+
+            file_type_count[extension] = (
+                file_type_count.get(
+                    extension,
+                    0,
+                )
+                + 1
+            )
+
+            lines = file.content.splitlines()
+
+            total_lines += len(lines)
+
+            blank_lines += sum(
+                1 for line in lines if not line.strip()
+            )
+
+            largest_files.append(
+                {
+                    "path": os.path.relpath(
+                        file.path,
+                        repository,
+                    ),
+                    "lines": len(lines),
+                    "language": file.language,
+                }
+            )
+
+        largest_files.sort(
+            key=lambda item: item["lines"],
+            reverse=True,
+        )
 
         return {
             "files": file_count,
             "lines": total_lines,
+            "blank_lines": blank_lines,
+            "directories": self.count_directories(repository),
             "languages": language_count,
+            "file_types": file_type_count,
+            "largest_files": largest_files[:5],
         }
+
+    # ---------------------------------------------------------
+
+    def count_directories(self, repository: Path) -> int:
+        """Number of directories in a repository, ignoring generated ones."""
+
+        count = 0
+
+        for path in repository.rglob("*"):
+
+            if not path.is_dir():
+                continue
+
+            if self.should_skip(path):
+                continue
+
+            count += 1
+
+        return count
 
     # ---------------------------------------------------------
 

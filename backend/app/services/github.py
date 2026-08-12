@@ -113,13 +113,45 @@ class GitHubService:
             "stars": repo.stargazers_count,
             "forks": repo.forks_count,
             "open_issues": repo.open_issues_count,
+            "watchers": repo.watchers_count,
             "clone_url": repo.clone_url,
-            "pushed_at": (
-                repo.pushed_at.isoformat()
-                if repo.pushed_at
-                else None
-            ),
+            "homepage": repo.homepage,
+            "topics": self._safe_topics(repo),
+            "license": self._safe_license(repo),
+            "size": repo.size,
+            "archived": repo.archived,
+            "is_fork": repo.fork,
+            "created_at": self._iso(repo.created_at),
+            "pushed_at": self._iso(repo.pushed_at),
+            "updated_at": self._iso(repo.updated_at),
         }
+
+    @staticmethod
+    def _iso(value) -> str | None:
+        return value.isoformat() if value else None
+
+    @staticmethod
+    def _safe_topics(repo: Repository) -> list[str]:
+        try:
+            return list(repo.topics)
+        except Exception:
+            return []
+
+    @staticmethod
+    def _safe_license(repo: Repository) -> str | None:
+        try:
+            license_ = repo.license
+
+            if license_ is None:
+                return None
+
+            return (
+                getattr(license_, "name", None)
+                or getattr(license_, "spdx_id", None)
+                or "Other"
+            )
+        except Exception:
+            return None
 
     def get_head_commit_sha(self, repo_url: str) -> str | None:
         """
@@ -272,6 +304,87 @@ class GitHubService:
             )
         except Exception:
             return 0
+
+    # ---------------------------------------------------------
+    # Git History
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def head_commit_info(path: Path) -> dict | None:
+        """Head commit details for the local clone's current branch."""
+        try:
+            commit = Repo(path).head.commit
+
+            return {
+                "sha": commit.hexsha,
+                "short_sha": commit.hexsha[:7],
+                "message": commit.message.strip(),
+                "author": commit.author.name,
+                "date": (
+                    commit.committed_datetime.isoformat()
+                    if commit.committed_datetime
+                    else None
+                ),
+            }
+        except Exception:
+            return None
+
+    @staticmethod
+    def count_commits(path: Path) -> int:
+        """Total number of commits in the local clone's history."""
+        try:
+            return sum(1 for _ in Repo(path).iter_commits())
+        except Exception:
+            return 0
+
+    @staticmethod
+    def top_contributors(
+        path: Path,
+        limit: int = 8,
+    ) -> list[dict]:
+        """Most active committers ordered by number of commits."""
+        try:
+            result: list[dict] = []
+
+            for line in Repo(path).git.shortlog(
+                "-sn",
+                "--all",
+            ).splitlines():
+
+                if not line.strip():
+                    continue
+
+                if len(result) >= limit:
+                    break
+
+                parts = line.strip().split("\t")
+
+                if len(parts) < 2:
+                    continue
+
+                try:
+                    commits = int(parts[0])
+                except ValueError:
+                    commits = 0
+
+                result.append(
+                    {
+                        "name": parts[1],
+                        "commits": commits,
+                    }
+                )
+
+            return result
+        except Exception:
+            return []
+
+    def get_git_info(self, path: Path) -> dict:
+        """Combined git history summary for a local clone."""
+        return {
+            "head_commit": self.head_commit_info(path),
+            "total_commits": self.count_commits(path),
+            "top_contributors": self.top_contributors(path),
+        }
 
 
 github_service = GitHubService()

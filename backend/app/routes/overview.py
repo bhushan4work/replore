@@ -1,9 +1,7 @@
-from pathlib import Path
-
 from fastapi import APIRouter, HTTPException
 
-from app.database import supabase
 from app.config import settings
+from app.database import supabase
 from app.services.github import github_service
 from app.services.parser import parser_service
 
@@ -17,8 +15,7 @@ async def get_repository_overview(repository_id: str):
     Returns:
     - Repository metadata
     - Statistics
-    - Folder structure
-    - Dependency files
+    - Git activity
     """
 
     repository = (
@@ -56,14 +53,7 @@ async def get_repository_overview(repository_id: str):
         github_service.count_contributors(repository_path)
     )
 
-    dependency_files = [
-        str(file.relative_to(repository_path))
-        for file in parser_service.dependency_files(
-            repository_path
-        )
-    ]
-
-    tree = build_directory_tree(repository_path)
+    git_info = github_service.get_git_info(repository_path)
 
     metadata = github_service.get_repository_metadata(
         repo["github_url"]
@@ -71,41 +61,24 @@ async def get_repository_overview(repository_id: str):
 
     return {
         "repository": metadata,
-        "statistics": statistics,
-        "dependency_files": dependency_files,
-        "directory_tree": tree,
+        "statistics": {
+            key: statistics[key]
+            for key in (
+                "files",
+                "lines",
+                "blank_lines",
+                "directories",
+                "languages",
+                "contributors",
+            )
+        },
+        "git": {
+            "default_branch": repo.get("default_branch"),
+            "head_commit": git_info.get("head_commit"),
+            "total_commits": git_info.get("total_commits", 0),
+            "top_contributors": git_info.get(
+                "top_contributors",
+                [],
+            ),
+        },
     }
-
-
-def build_directory_tree(path: Path):
-
-    children = []
-
-    for item in sorted(
-        path.iterdir(),
-        key=lambda x: (x.is_file(), x.name.lower()),
-    ):
-
-        if item.name.startswith(".git"):
-            continue
-
-        if item.is_dir():
-
-            children.append(
-                {
-                    "name": item.name,
-                    "type": "directory",
-                    "children": build_directory_tree(item),
-                }
-            )
-
-        else:
-
-            children.append(
-                {
-                    "name": item.name,
-                    "type": "file",
-                }
-            )
-
-    return children
