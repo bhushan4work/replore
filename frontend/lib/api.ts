@@ -96,6 +96,26 @@ export interface OverviewDirectoryNode {
   children?: OverviewDirectoryNode[];
 }
 
+export interface HeadCommit {
+  sha: string;
+  short_sha: string;
+  message: string;
+  author: string;
+  date: string | null;
+}
+
+export interface ContributorStat {
+  name: string;
+  commits: number;
+}
+
+export interface RepositoryGitInfo {
+  default_branch: string | null;
+  head_commit: HeadCommit | null;
+  total_commits: number;
+  top_contributors: ContributorStat[];
+}
+
 export interface RepositoryOverview {
   repository: {
     id: number;
@@ -108,17 +128,27 @@ export interface RepositoryOverview {
     stars: number;
     forks: number;
     open_issues: number;
+    watchers: number;
     clone_url: string;
+    homepage: string | null;
+    topics: string[];
+    license: string | null;
+    size: number | null;
+    archived: boolean;
+    is_fork: boolean;
+    created_at: string | null;
     pushed_at: string | null;
+    updated_at: string | null;
   };
   statistics: {
     files: number;
     lines: number;
+    blank_lines: number;
+    directories: number;
     languages: Record<string, number>;
     contributors: number;
   };
-  dependency_files: string[];
-  directory_tree: OverviewDirectoryNode[];
+  git: RepositoryGitInfo;
 }
 
 export async function getRepositoryOverview(
@@ -135,9 +165,45 @@ export async function getRepositoryOverview(
   return res.json();
 }
 
+export interface ArchitectureLanguage {
+  name: string;
+  files: number;
+  lines: number;
+  percent: number;
+}
+
+export interface ArchitectureDirectoryStat {
+  path: string;
+  files: number;
+  lines: number;
+}
+
+export interface ArchitectureEntryPoint {
+  path: string;
+  kind: string;
+}
+
+export interface ArchitectureDependency {
+  name: string;
+  language: string;
+}
+
+export interface ArchitectureKeyFile {
+  path: string;
+  lines: number;
+  language: string;
+}
+
 export interface RepositoryArchitecture {
   repository_id: string;
   architecture: string;
+  tree: OverviewDirectoryNode[];
+  languages: ArchitectureLanguage[];
+  directories: ArchitectureDirectoryStat[];
+  entry_points: ArchitectureEntryPoint[];
+  technologies: string[];
+  dependencies: ArchitectureDependency[];
+  key_files: ArchitectureKeyFile[];
 }
 
 export async function getRepositoryArchitecture(
@@ -213,6 +279,8 @@ export interface ChatResponse {
   answer: string;
 }
 
+const CHAT_TIMEOUT_MS = 90_000;
+
 export async function sendChatMessage(
   repositoryId: string,
   question: string
@@ -223,6 +291,7 @@ export async function sendChatMessage(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
+      signal: AbortSignal.timeout(CHAT_TIMEOUT_MS),
     }
   );
 

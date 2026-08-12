@@ -1,5 +1,28 @@
-import RepoArchitecture from "@/components/repo-architecture";
-import { ApiError, getRepositoryArchitecture } from "@/lib/api";
+import RepoArchitecture from "@/components/dashboard/repo-architecture";
+import {
+  ApiError,
+  getRepositoryArchitecture,
+  type OverviewDirectoryNode,
+} from "@/lib/api";
+
+interface FileNode {
+  id: string;
+  name: string;
+  type: "file" | "folder";
+  children?: FileNode[];
+}
+
+function mapTree(
+  nodes: OverviewDirectoryNode[],
+  counter = { n: 0 }
+): FileNode[] {
+  return nodes.map((node) => ({
+    id: String(counter.n++),
+    name: node.name,
+    type: node.type === "directory" ? "folder" : "file",
+    children: node.children ? mapTree(node.children, counter) : undefined,
+  }));
+}
 
 function ArchitectureError({ message }: { message: string }) {
   return (
@@ -19,10 +42,10 @@ export default async function ArchitecturePage({
 }) {
   const { repositoryId } = await params;
 
-  let architecture: string;
+  let data;
 
   try {
-    ({ architecture } = await getRepositoryArchitecture(repositoryId));
+    data = await getRepositoryArchitecture(repositoryId);
   } catch (err) {
     return (
       <ArchitectureError
@@ -35,5 +58,16 @@ export default async function ArchitecturePage({
     );
   }
 
-  return <RepoArchitecture markdown={architecture} />;
+  return (
+    <RepoArchitecture
+      markdown={data.architecture}
+      tree={mapTree(data.tree)}
+      languages={data.languages}
+      directories={data.directories}
+      entryPoints={data.entry_points}
+      technologies={data.technologies}
+      dependencies={data.dependencies}
+      keyFiles={data.key_files}
+    />
+  );
 }

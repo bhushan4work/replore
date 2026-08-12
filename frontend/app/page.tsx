@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Warp } from "@paper-design/shaders-react";
-import { GithubStar } from "@/components/github-star";
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
-import Features from "@/components/features";
-import DemoShowcase from "@/components/demo-showcase";
+import { GithubStar } from "@/components/landing-page/github-star";
+import Footer from "@/components/landing-page/footer";
+import Navbar from "@/components/landing-page/navbar";
+import Features from "@/components/landing-page/features";
+import DemoShowcase from "@/components/landing-page/demo-showcase";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { CircleAlert, Loader2 } from "lucide-react";
-import FAQSection from "@/components/faq-section";
+import FAQSection from "@/components/landing-page/faq-section";
 import { createAnalysisJob } from "@/lib/api";
 
 const GITHUB_REPO_REGEX =

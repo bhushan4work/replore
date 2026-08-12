@@ -68,16 +68,16 @@ export default function Sidebar({
 
     return (
         <aside
-            className={`relative flex h-screen flex-col border-r border-zinc-800 bg-zinc-950 transition-all duration-300 ${collapsed ? "w-20" : "w-72"
+            className={`relative flex h-screen flex-col border-r border-zinc-800 bg-zinc-950 transition-all duration-300 ${collapsed ? "w-20" : "w-92"
                 }`}
         >
             {/* Header */}
 
             <div className="flex h-16 items-center justify-between border-b border-zinc-800 px-5">
                 {!collapsed && (
-                    <h1 className="text-lg font-semibold tracking-wide text-white">
-                        replore
-                    </h1>
+                    <Link className="text-lg font-semibold tracking-wide text-white" href="/">
+                        Replore
+                    </Link>
                 )}
 
                 <button

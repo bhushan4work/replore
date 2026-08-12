@@ -1,4 +1,4 @@
-import RepoGraph from "@/components/repo-graph";
+import RepoGraph from "@/components/dashboard/repo-graph";
 import {
   ApiError,
   getRepositoryGraph,

@@ -1,4 +1,4 @@
-import RepoDocs from "@/components/repo-docs";
+import RepoDocs from "@/components/dashboard/repo-docs";
 import { ApiError, getRepositoryDocs } from "@/lib/api";
 
 function DocsError({ message }: { message: string }) {

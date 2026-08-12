@@ -1,28 +1,5 @@
-import RepoOverview from "@/components/repo-overview";
-import {
-  ApiError,
-  getRepositoryOverview,
-  type OverviewDirectoryNode,
-} from "@/lib/api";
-
-interface FileNode {
-  id: string;
-  name: string;
-  type: "file" | "folder";
-  children?: FileNode[];
-}
-
-function mapTree(
-  nodes: OverviewDirectoryNode[],
-  counter = { n: 0 }
-): FileNode[] {
-  return nodes.map((node) => ({
-    id: String(counter.n++),
-    name: node.name,
-    type: node.type === "directory" ? "folder" : "file",
-    children: node.children ? mapTree(node.children, counter) : undefined,
-  }));
-}
+import RepoOverview from "@/components/dashboard/repo-overview";
+import { ApiError, getRepositoryOverview } from "@/lib/api";
 
 function primaryLanguagePercent(languages: Record<string, number>): string {
   const entries = Object.entries(languages);
@@ -55,6 +32,31 @@ function timeAgo(iso: string | null): string {
   if (days < 30) return `${days} day${days > 1 ? "s" : ""} ago`;
 
   return new Date(iso).toLocaleDateString();
+}
+
+function formatDate(iso: string | null): string | null {
+  if (!iso) return null;
+
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatSize(sizeKb: number | null): string | null {
+  if (sizeKb == null || sizeKb <= 0) return null;
+
+  const units = ["KB", "MB", "GB"];
+  let value = sizeKb;
+  let unit = "KB";
+
+  for (let i = 1; i < units.length && value >= 1024; i++) {
+    value /= 1024;
+    unit = units[i];
+  }
+
+  return `${value >= 100 ? Math.round(value) : value.toFixed(1)} ${unit}`;
 }
 
 function OverviewError({ message }: { message: string }) {
@@ -91,21 +93,39 @@ export default async function Page({
     );
   }
 
-  const { repository, statistics } = overview;
+  const { repository, statistics, git } = overview;
 
   return (
     <RepoOverview
       repoName={repository.full_name}
+      repoOwner={repository.owner}
+      description={repository.description}
       stars={repository.stars}
-      languages={Object.keys(statistics.languages)}
+      forks={repository.forks}
+      openIssues={repository.open_issues}
+      watchers={repository.watchers}
+      defaultBranch={repository.default_branch}
+      homepage={repository.homepage}
+      license={repository.license}
+      topics={repository.topics}
+      createdLabel={formatDate(repository.created_at)}
+      sizeLabel={formatSize(repository.size)}
+      archived={repository.archived}
+      isFork={repository.is_fork}
       lastUpdated={timeAgo(repository.pushed_at)}
       stats={{
         totalFiles: statistics.files,
         linesOfCode: statistics.lines,
-        primaryLanguagePercent: primaryLanguagePercent(statistics.languages),
+        blankLines: statistics.blank_lines,
+        directories: statistics.directories,
+        primaryLanguagePercent: primaryLanguagePercent(
+          statistics.languages
+        ),
         contributors: statistics.contributors,
+        totalCommits: git.total_commits,
       }}
-      fileTree={mapTree(overview.directory_tree)}
+      headCommit={git.head_commit}
+      topContributors={git.top_contributors}
     />
   );
 }
