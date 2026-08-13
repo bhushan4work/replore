@@ -127,7 +127,7 @@ export default function RepoDocs({ markdown, title }: RepoDocsProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <div className="mx-auto flex max-w-8xl gap-8 px-6 py-10">
+      <div className="mx-auto flex max-w-7xl gap-8 px-6 py-10">
 
         {/* Content */}
         <section className="min-w-0 flex-1">
@@ -142,11 +142,11 @@ export default function RepoDocs({ markdown, title }: RepoDocsProps) {
             </button>
           </div>
 
-          <article className="prose prose-invert prose-zinc mx-auto max-w-7xl">
+          <article className="prose prose-invert prose-zinc mx-auto max-w-7xl prose-headings:mb-0 prose-h1:text-3xl prose-h2:text-xl prose-h3:text-lg">
             <ReactMarkdown
               components={{
                 h2: ({ children }) => (
-                  <h2 id={slugify(nodeToText(children))}>
+                  <h2 id={slugify(nodeToText(children))} >
                     {children}
                   </h2>
                 ),

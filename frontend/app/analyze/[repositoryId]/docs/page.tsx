@@ -20,9 +20,10 @@ export default async function DocsPage({
   const { repositoryId } = await params;
 
   let documentation: string;
+  let title: string | undefined;
 
   try {
-    ({ documentation } = await getRepositoryDocs(repositoryId));
+    ({ documentation, title } = await getRepositoryDocs(repositoryId));
   } catch (err) {
     return (
       <DocsError
@@ -35,5 +36,5 @@ export default async function DocsPage({
     );
   }
 
-  return <RepoDocs markdown={documentation} />;
+  return <RepoDocs markdown={documentation} title={title} />;
 }

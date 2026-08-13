@@ -256,6 +256,7 @@ export async function getRepositoryGraph(
 
 export interface RepositoryDocs {
   repository_id: string;
+  title?: string;
   documentation: string;
 }
 
