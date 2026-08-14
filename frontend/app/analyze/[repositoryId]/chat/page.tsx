@@ -6,7 +6,7 @@ import RepoChat, {
   type ChatMessage,
   type CodeReference,
 } from "@/components/dashboard/repo-chat";
-import { ApiError, sendChatMessage } from "@/lib/api";
+import { ApiError, sendChatMessage, type SourceRef } from "@/lib/api";
 
 const GENERIC_INVALID_MESSAGE =
   "I can only answer questions related to this repository. Please ask about its code, structure, or features.";
@@ -195,16 +195,77 @@ function isValidQuestion(input: string): boolean {
   return !CHATTER_PHRASES.has(normalizeQuestion(input));
 }
 
+// ---------------------------------------------------------
+// localStorage helpers for session_id persistence
+// ---------------------------------------------------------
+
+function sessionStorageKey(repositoryId: string): string {
+  return `replore_chat_session_${repositoryId}`;
+}
+
+function getPersistedSessionId(repositoryId: string): string | null {
+  try {
+    return localStorage.getItem(sessionStorageKey(repositoryId));
+  } catch {
+    return null;
+  }
+}
+
+function setPersistedSessionId(
+  repositoryId: string,
+  sessionId: string
+): void {
+  try {
+    localStorage.setItem(sessionStorageKey(repositoryId), sessionId);
+  } catch {
+    // localStorage may be unavailable (e.g. private browsing).
+  }
+}
+
+// ---------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------
+
+function sourcesToReferences(
+  sources: { file_path: string; symbol: string | null; start_line: number | null; end_line: number | null }[]
+): CodeReference[] {
+  return sources.map((s) => ({
+    filePath: s.file_path,
+    symbol: s.symbol ?? undefined,
+    startLine: s.start_line ?? undefined,
+    endLine: s.end_line ?? undefined,
+  }));
+}
+
+// ---------------------------------------------------------
+// Page component
+// ---------------------------------------------------------
+
 export default function ChatPage() {
   const { repositoryId } = useParams<{ repositoryId: string }>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typing, setTyping] = useState(false);
   const inFlightRef = useRef(0);
 
-  const appendAssistant = (content: string) => {
+  // Lazily initialise session ID from localStorage.
+  const sessionIdRef = useRef<string | null>(
+    typeof window !== "undefined"
+      ? getPersistedSessionId(repositoryId)
+      : null
+  );
+
+  const appendAssistant = (
+    content: string,
+    sources?: CodeReference[]
+  ) => {
     setMessages((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), role: "assistant", content },
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content,
+        ...(sources && sources.length > 0 ? { sources } : {}),
+      },
     ]);
   };
 
@@ -229,14 +290,27 @@ export default function ChatPage() {
     inFlightRef.current += 1;
 
     try {
-      const response = await sendChatMessage(repositoryId, question);
+      const response = await sendChatMessage(
+        repositoryId,
+        question,
+        sessionIdRef.current
+      );
+
+      // Persist the session ID returned by the backend.
+      if (response.session_id) {
+        sessionIdRef.current = response.session_id;
+        setPersistedSessionId(repositoryId, response.session_id);
+      }
 
       const unanswered = response.answer
         .toLowerCase()
         .includes("couldn't find relevant information");
 
+      const refs = sourcesToReferences(response.sources ?? []);
+
       appendAssistant(
-        unanswered ? NO_INFORMATION_MESSAGE : response.answer
+        unanswered ? NO_INFORMATION_MESSAGE : response.answer,
+        refs
       );
     } catch (err) {
       let message: string;

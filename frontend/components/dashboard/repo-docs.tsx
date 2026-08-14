@@ -5,9 +5,7 @@ import { isValidElement, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import { DownloadSimple } from "@phosphor-icons/react";
 
-// ---------------------------------------------------------
 // Data model
-// ---------------------------------------------------------
 
 export interface RepoDocsProps {
   markdown: string;
@@ -20,9 +18,7 @@ interface TocItem {
   text: string;
 }
 
-// ---------------------------------------------------------
 // Heading slugging + text extraction (shared by TOC and render)
-// ---------------------------------------------------------
 
 function slugify(text: string): string {
   return text

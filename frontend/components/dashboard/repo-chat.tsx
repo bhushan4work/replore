@@ -14,8 +14,11 @@ import {
 
 export interface CodeReference {
   filePath: string;
-  lineNumber: number;
-  code: string;
+  symbol?: string;
+  startLine?: number;
+  endLine?: number;
+  lineNumber?: number;
+  code?: string;
 }
 
 export interface ChatMessage {
@@ -23,6 +26,7 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   codeReference?: CodeReference;
+  sources?: CodeReference[];
 }
 
 export interface RepoChatProps {
@@ -33,7 +37,7 @@ export interface RepoChatProps {
 }
 
 // ---------------------------------------------------------
-// Collapsible code snippet
+// Collapsible code snippet (legacy single-reference)
 // ---------------------------------------------------------
 
 function CodeSnippet({
@@ -67,15 +71,69 @@ function CodeSnippet({
           className="truncate font-mono text-xs text-violet-300 underline-offset-2 transition hover:text-violet-200 hover:underline"
           title="Open in architecture/graph view"
         >
-          {reference.filePath}:{reference.lineNumber}
+          {reference.filePath}
+          {reference.lineNumber != null ? `:${reference.lineNumber}` : ""}
         </button>
       </div>
 
-      {open && (
+      {open && reference.code && (
         <pre className="max-h-80 overflow-auto border-t border-[#2a2a2a] px-4 py-3 text-xs leading-relaxed text-gray-200">
           <code>{reference.code}</code>
         </pre>
       )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------
+// Referenced files list (structured sources from backend)
+// ---------------------------------------------------------
+
+function ReferencedFiles({
+  sources,
+  onFileClick,
+}: {
+  sources: CodeReference[];
+  onFileClick?: (reference: CodeReference) => void;
+}) {
+  if (!sources.length) return null;
+
+  return (
+    <div className="mt-3 rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] px-3 py-2">
+      <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-gray-500">
+        Referenced files
+      </p>
+
+      <ul className="space-y-1">
+        {sources.map((source, idx) => {
+          const lineRange =
+            source.startLine != null && source.endLine != null
+              ? `:${source.startLine}-${source.endLine}`
+              : source.startLine != null
+                ? `:${source.startLine}`
+                : "";
+
+          const label = source.symbol
+            ? `${source.filePath}${lineRange} — ${source.symbol}`
+            : `${source.filePath}${lineRange}`;
+
+          return (
+            <li key={`${source.filePath}-${idx}`}>
+              <button
+                onClick={() => onFileClick?.(source)}
+                className="flex items-center gap-1.5 font-mono text-xs text-violet-300 underline-offset-2 transition hover:text-violet-200 hover:underline"
+                title="Open file"
+              >
+                <FileCode
+                  size={12}
+                  className="shrink-0 text-violet-400"
+                />
+                {label}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -111,6 +169,13 @@ function MessageBubble({
         {message.codeReference && (
           <CodeSnippet
             reference={message.codeReference}
+            onFileClick={onCodeFileClick}
+          />
+        )}
+
+        {message.sources && message.sources.length > 0 && (
+          <ReferencedFiles
+            sources={message.sources}
             onFileClick={onCodeFileClick}
           />
         )}

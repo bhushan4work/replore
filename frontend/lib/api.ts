@@ -274,24 +274,40 @@ export async function getRepositoryDocs(
   return res.json();
 }
 
+export interface SourceRef {
+  file_path: string;
+  symbol: string | null;
+  start_line: number | null;
+  end_line: number | null;
+}
+
 export interface ChatResponse {
   repository_id: string;
+  session_id: string;
   question: string;
   answer: string;
+  sources: SourceRef[];
 }
 
 const CHAT_TIMEOUT_MS = 90_000;
 
 export async function sendChatMessage(
   repositoryId: string,
-  question: string
+  question: string,
+  sessionId?: string | null
 ): Promise<ChatResponse> {
+  const body: Record<string, string> = { question };
+
+  if (sessionId) {
+    body.session_id = sessionId;
+  }
+
   const res = await fetch(
     `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/chat`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify(body),
       signal: AbortSignal.timeout(CHAT_TIMEOUT_MS),
     }
   );
