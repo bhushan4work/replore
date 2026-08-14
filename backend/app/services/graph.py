@@ -113,6 +113,9 @@ class GraphService:
     @staticmethod
     def to_react_flow(
         graph: nx.DiGraph,
+        *,
+        truncated: bool = False,
+        original_node_count: int | None = None,
     ) -> dict:
 
         nodes = []
@@ -143,10 +146,16 @@ class GraphService:
                 }
             )
 
-        return {
+        result: dict = {
             "nodes": nodes,
             "edges": edges,
         }
+
+        if truncated:
+            result["truncated"] = True
+            result["total_nodes"] = original_node_count
+
+        return result
 
     # ---------------------------------------------------------
 
@@ -159,8 +168,26 @@ class GraphService:
             repository
         )
 
+        max_nodes = settings.MAX_GRAPH_NODES
+        original_count = graph.number_of_nodes()
+        truncated = False
+
+        if original_count > max_nodes:
+            # Keep the most-connected nodes (highest total degree).
+            ranked = sorted(
+                graph.nodes,
+                key=lambda n: graph.degree(n),
+                reverse=True,
+            )
+
+            keep = set(ranked[:max_nodes])
+            graph = graph.subgraph(keep).copy()
+            truncated = True
+
         return self.to_react_flow(
-            graph
+            graph,
+            truncated=truncated,
+            original_node_count=original_count if truncated else None,
         )
 
 

@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+# pyrefly: ignore [missing-import]
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -98,6 +99,9 @@ class Settings(BaseSettings):
     MAX_CONTEXT_CHARS: int = 12000
     LLM_RETRY_ATTEMPTS: int = 3
 
+    CHAT_HISTORY_TURNS: int = 6
+    MAX_HISTORY_CHARS: int = 4000
+
     # -------------------------------------------------
     # Scanning Limits
     # -------------------------------------------------
@@ -107,6 +111,7 @@ class Settings(BaseSettings):
     MAX_REPOSITORY_SIZE_MB: int = 150
     MAX_FILE_SIZE_KB: int = 512
     MAX_FILE_COUNT: int = 5000
+    MAX_GRAPH_NODES: int = 150
 
     # -------------------------------------------------
     # Frontend

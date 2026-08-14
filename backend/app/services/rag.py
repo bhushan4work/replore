@@ -22,10 +22,16 @@ class RAGService:
         self,
         repository_id: str,
         question: str,
+        standalone_query: str | None = None,
     ) -> list[dict[str, Any]]:
 
+        # When a standalone (rewritten) query is available, embed
+        # that instead so follow-up questions retrieve relevant
+        # chunks even when the raw question is ambiguous.
+        embed_text = standalone_query or question
+
         query_embedding = embedding_service.embed_query(
-            question
+            embed_text
         )
 
         response = (
@@ -94,17 +100,22 @@ class RAGService:
     @staticmethod
     def build_context(
         chunks: list[dict[str, Any]],
-    ) -> str:
+    ) -> tuple[str, list[dict[str, Any]]]:
         """
         Formats retrieved chunks with source metadata and keeps the
         combined context within MAX_CONTEXT_CHARS so the prompt stays
         within practical LLM limits.
+
+        Returns a tuple of (context_string, used_chunks) so callers
+        can extract source metadata from only the chunks that actually
+        fit within the budget.
         """
 
         if not chunks:
-            return ""
+            return "", []
 
         parts: list[str] = []
+        used: list[dict[str, Any]] = []
         total = 0
 
         for chunk in chunks:
@@ -121,12 +132,59 @@ class RAGService:
 
             if len(block) > remaining:
                 parts.append(block[:remaining])
+                used.append(chunk)
                 break
 
             parts.append(block)
+            used.append(chunk)
             total += len(block)
 
-        return "\n".join(parts)
+        return "\n".join(parts), used
+
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def extract_sources(
+        chunks: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """
+        Derives a deduplicated list of source references from the
+        chunks that were actually used in the context.
+
+        Each entry has: file_path, symbol, start_line, end_line.
+        """
+
+        seen: set[tuple] = set()
+        sources: list[dict[str, Any]] = []
+
+        for chunk in chunks:
+
+            file_path = chunk.get("file_path")
+
+            if not file_path:
+                continue
+
+            symbol = chunk.get("symbol")
+            start_line = chunk.get("start_line")
+            end_line = chunk.get("end_line")
+
+            key = (file_path, symbol, start_line, end_line)
+
+            if key in seen:
+                continue
+
+            seen.add(key)
+
+            sources.append(
+                {
+                    "file_path": file_path,
+                    "symbol": symbol,
+                    "start_line": start_line,
+                    "end_line": end_line,
+                }
+            )
+
+        return sources
 
 
 rag_service = RAGService()
