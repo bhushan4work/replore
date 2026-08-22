@@ -39,16 +39,6 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # -------------------------------------------------
-    # Gemini
-    # -------------------------------------------------
-
-    GROQ_API_KEY: str
-    GEMINI_API_KEY: str
-
-    EMBEDDING_MODEL: str = "models/gemini-embedding-001"
-    LLM_MODEL: str = "llama-3.3-70b-versatile"
-
-    # -------------------------------------------------
     # GitHub
     # -------------------------------------------------
 
@@ -69,38 +59,6 @@ class Settings(BaseSettings):
     # -------------------------------------------------
 
     REPOS_DIR: Path = Field(default=ROOT_DIR / "repositories")
-
-    # -------------------------------------------------
-    # Chunking
-    # -------------------------------------------------
-
-    CHUNK_SIZE: int = 1200
-    CHUNK_OVERLAP: int = 200
-
-    # -------------------------------------------------
-    # Embedding
-    # -------------------------------------------------
-    # Chunks are embedded in batches of EMBED_BATCH_SIZE and each batch
-    # is retried EMBED_RETRY_ATTEMPTS times before individual fallback.
-
-    EMBED_BATCH_SIZE: int = 16
-    EMBED_RETRY_ATTEMPTS: int = 3
-    EMBED_TIMEOUT_SECONDS: int = 60
-
-    # -------------------------------------------------
-    # Retrieval & Chat
-    # -------------------------------------------------
-    # RAG keeps the prompt within practical LLM limits: RAG_TOP_K chunks
-    # are retrieved per question, MAX_CONTEXT_CHARS caps the combined
-    # context sent to the model, and transient LLM failures are retried
-    # LLM_RETRY_ATTEMPTS times.
-
-    RAG_TOP_K: int = 8
-    MAX_CONTEXT_CHARS: int = 12000
-    LLM_RETRY_ATTEMPTS: int = 3
-
-    CHAT_HISTORY_TURNS: int = 6
-    MAX_HISTORY_CHARS: int = 4000
 
     # -------------------------------------------------
     # Scanning Limits

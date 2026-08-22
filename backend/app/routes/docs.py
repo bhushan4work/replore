@@ -11,7 +11,6 @@ from app.routes.architecture import (
     find_entry_points,
     parse_dependencies,
 )
-from app.services.ai import ai_service
 from app.services.github import github_service
 
 router = APIRouter(
@@ -59,9 +58,9 @@ TREE_DEPTH_LIMIT = 4
 @router.get("/{repository_id}/docs")
 async def generate_documentation(repository_id: str):
     """
-    Generates README-style repository documentation using AI, grounded
-    in the repository's actual metadata, structure, languages,
-    technologies, and dependencies.
+    Returns README-style repository documentation grounded in the
+    repository's actual metadata, structure, languages, technologies,
+    and dependencies.
     """
 
     repository = (
@@ -123,9 +122,8 @@ async def generate_documentation(repository_id: str):
         config_files=_read_manifest_files(repository_path),
     )
 
-    documentation = ai_service.chat(
-        question=build_docs_prompt(title),
-        context=context,
+    documentation = (
+        f"# {title}\n\n{context}"
     )
 
     return {
@@ -254,8 +252,7 @@ def build_docs_context(
     config_files: list[tuple[str, str]],
 ) -> str:
     """
-    Builds the grounded repository context sent to the LLM so the
-    generated documentation is based on real data.
+    Builds repository documentation from local metadata and files.
     """
 
     parts: list[str] = []
@@ -366,85 +363,4 @@ def build_docs_context(
     return "\n\n".join(parts)
 
 
-def build_docs_prompt(title: str) -> str:
-    """
-    Prompt for a grounded README-style document following a fixed,
-    repo-agnostic structure. Everything must be derived from the
-    repository context; nothing may be invented.
-    """
 
-    return f"""
-Write documentation for the GitHub repository `{title}`.
-
-Base everything strictly on the repository context provided below. It
-contains the repository's actual metadata, README, file structure,
-languages, technologies, entry points, dependencies, key files, and
-configuration/manifest files. Do not invent features, behavior, files,
-modules, or dependencies that are not present in the context. If
-something cannot be determined from the repository, write "not
-detected". Never expose secrets, API keys, tokens, or private
-credentials.
-
-Use the following structure (exact headings):
-
-# project overview
-- what the project does
-- its main purpose/use case
-- key technologies used
-- current project status if it can be inferred
-
-# how the project works
-- explain the overall flow in simple terms
-- explain how the main parts of the application interact
-- mention the important flow from user input to output
-
-# project structure
-- explain the important folders and files
-- focus on files that actually matter to understanding the project
-- briefly explain the responsibility of each
-
-# main features
-for each important feature:
-- what it does
-- how it works
-- important files/components involved
-
-# architecture
-- explain the major parts of the system
-- explain how frontend, backend, database, external services, and other major components interact
-- keep this understandable rather than overly technical
-
-# data and api
-- explain important data models, database tables, or stored data if present
-- document important api routes/functions if present
-- include inputs, outputs, and their purpose
-
-# important code
-- identify the most important components, functions, classes, or modules
-- explain what each does and why it matters
-- reference their actual file paths
-
-# dependencies and configuration
-- mention important external libraries/services
-- explain what they are used for
-- mention important environment variables and configuration files without exposing secret values
-
-# development
-- explain how to install and run the project
-- mention available development, build, test, and lint commands when present
-
-# observations
-- mention notable implementation choices
-- identify obvious missing pieces, TODOs, potential issues, or technical debt when detectable
-- clearly distinguish facts from reasonable inferences
-
-rules:
-- keep explanations simple and concise
-- prioritize useful information over exhaustive descriptions
-- use actual repository information only
-- reference relevant file paths throughout the documentation
-- do not repeat the same information across sections
-- do not generate generic explanations unrelated to this repository
-- if something cannot be determined from the repository, say "not detected"
-- use markdown headings, bullet points, tables, and code snippets where they improve readability
-"""

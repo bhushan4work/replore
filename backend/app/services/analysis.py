@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from git import GitCommandError
 from github.GithubException import GithubException, UnknownObjectException
@@ -16,14 +16,10 @@ from tenacity import (
 
 from app.config import settings
 from app.database import supabase
-from app.services.embeddings import embedding_service
 from app.services.github import github_service
-from app.services.parser import CodeChunk, parser_service
+from app.services.parser import parser_service
 
 logger = logging.getLogger(__name__)
-
-CHUNK_BATCH_SIZE = 100
-
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -207,106 +203,6 @@ def _mark_repository_completed(
     )
 
 
-def _chunk_batches(
-    chunks: Iterator[CodeChunk],
-    batch_size: int,
-) -> Iterator[list[CodeChunk]]:
-    """
-    Groups non-empty chunks into fixed-size batches so embeddings can be
-    requested in bulk instead of one request per chunk.
-    """
-
-    batch: list[CodeChunk] = []
-
-    for chunk in chunks:
-
-        # Skip empty chunks so a single empty file cannot fail
-        # the whole indexing stage.
-        if not chunk.content or not chunk.content.strip():
-            continue
-
-        batch.append(chunk)
-
-        if len(batch) >= batch_size:
-
-            yield batch
-            batch = []
-
-    if batch:
-        yield batch
-
-
-def _embed_chunk_batch(
-    repository_id: str,
-    analysis_id: str,
-    batch: list[CodeChunk],
-) -> list[dict[str, Any]]:
-    """
-    Embeds a batch of chunks and builds database rows carrying
-    repository, analysis, file, and symbol metadata. Chunks whose
-    embedding permanently fails are skipped (and logged) without
-    discarding the successful ones.
-    """
-
-    embeddings = embedding_service.embed_texts(
-        [chunk.content for chunk in batch]
-    )
-
-    rows: list[dict[str, Any]] = []
-
-    for chunk, embedding in zip(batch, embeddings):
-
-        if embedding is None:
-
-            logger.warning(
-                "Skipping chunk with failed embedding: %s:%s.",
-                chunk.file_path,
-                chunk.chunk_index,
-            )
-
-            continue
-
-        rows.append(
-            {
-                "repository_id": repository_id,
-                "analysis_id": analysis_id,
-                "file_path": chunk.file_path,
-                "language": chunk.language,
-                "chunk_index": chunk.chunk_index,
-                "symbol": chunk.symbol,
-                "symbol_type": chunk.symbol_type,
-                "start_line": chunk.start_line,
-                "end_line": chunk.end_line,
-                "content": chunk.content,
-                "embedding": embedding,
-            }
-        )
-
-    return rows
-
-
-@retry(
-    retry=retry_if_exception_type(Exception),
-    wait=wait_exponential(multiplier=1, min=1, max=8),
-    stop=stop_after_attempt(3),
-    reraise=True,
-)
-def _insert_chunk_rows(rows: list[dict[str, Any]]) -> None:
-    """
-    Persists a batch of chunk rows. Uses upsert so a retried insert can
-    never duplicate a chunk within the same repository.
-    """
-
-    (
-        supabase.table("code_chunks")
-        .upsert(
-            rows,
-            on_conflict="repository_id,file_path,chunk_index",
-        )
-        .execute()
-    )
-
-
 def _find_cached_analysis(
     github_url: str,
     commit_sha: str,
@@ -465,8 +361,7 @@ def run_repository_analysis(
     """
     Runs the full repository analysis pipeline in the background.
 
-    Stages: cloning, scanning, parsing, analyzing, indexing,
-    generating_docs, completed.
+    Stages: cloning, scanning, parsing, analyzing, completed.
 
     The repository's HEAD commit identifies the version being analyzed.
     If that exact version was already analyzed successfully, the job
@@ -540,8 +435,6 @@ def run_repository_analysis(
 
         _update_job(job_id, status="parsing", stage="parsing")
 
-        chunks = parser_service.chunk_repository(local_repo)
-
         # -------------------------------------------------
         # Analyzing
         # -------------------------------------------------
@@ -549,50 +442,6 @@ def run_repository_analysis(
         _update_job(job_id, status="analyzing", stage="analyzing")
 
         parser_service.repository_statistics(local_repo)
-
-        # -------------------------------------------------
-        # Indexing (embedded in batches, streamed chunk-by-chunk)
-        # -------------------------------------------------
-
-        _update_job(job_id, status="indexing", stage="indexing")
-
-        rows: list[dict[str, Any]] = []
-
-        for batch in _chunk_batches(
-            chunks,
-            settings.EMBED_BATCH_SIZE,
-        ):
-
-            rows.extend(
-                _embed_chunk_batch(
-                    repository_id,
-                    job_id,
-                    batch,
-                )
-            )
-
-        for start in range(0, len(rows), CHUNK_BATCH_SIZE):
-
-            _insert_chunk_rows(
-                rows[start:start + CHUNK_BATCH_SIZE]
-            )
-
-        # Drop chunks left over from an earlier analysis of the same
-        # repository, so a re-analysis never leaves stale or duplicate
-        # embeddings behind.
-        (
-            supabase.table("code_chunks")
-            .delete()
-            .eq("repository_id", repository_id)
-            .or_(f"analysis_id.is.null,analysis_id.neq.{job_id}")
-            .execute()
-        )
-
-        # -------------------------------------------------
-        # Generating docs
-        # -------------------------------------------------
-
-        _update_job(job_id, status="generating_docs", stage="generating_docs")
 
         # Promote the temporary clone to the canonical location so the
         # on-demand overview/architecture/graph/docs routes can read it.

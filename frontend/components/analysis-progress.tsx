@@ -18,8 +18,6 @@ const PROCESSING_STAGES = [
   "scanning",
   "parsing",
   "analyzing",
-  "indexing",
-  "generating_docs",
 ] as const;
 
 const POLL_INTERVAL_MS = 2500;
@@ -49,10 +47,8 @@ export default function AnalysisProgress({
   const [retrying, setRetrying] = useState(false);
   const redirecting = useRef(false);
 
-  // Reset state when navigating to a new job (e.g. retry).
+  // Reset redirect state when navigating to a new job.
   useEffect(() => {
-    setStatus(null);
-    setFatalError(null);
     redirecting.current = false;
   }, [jobId]);
 

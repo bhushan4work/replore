@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.database import supabase
-from app.services.ai import ai_service
 from app.services.parser import parser_service
 
 router = APIRouter(
@@ -44,7 +43,7 @@ ENTRY_POINT_CANDIDATES = {
 @router.get("/{repository_id}/architecture")
 async def repository_architecture(repository_id: str):
     """
-    Generates a grounded architecture summary plus a structured,
+    Returns a structured architecture summary plus a structured,
     data-driven breakdown of the repository (project tree, languages,
     directory statistics, entry points, technologies, dependencies,
     and key files).
@@ -91,36 +90,12 @@ async def repository_architecture(repository_id: str):
         dependencies,
     )
 
-    context = build_llm_context(
+    summary = build_architecture_summary(
         tree=tree,
         analysis=analysis,
         entry_points=entry_points,
         dependencies=dependencies,
         technologies=technologies,
-    )
-
-    prompt = f"""
-You are analyzing a GitHub repository.
-
-Generate a concise but detailed architecture overview.
-
-Include:
-
-1. High-level purpose
-2. Folder organization
-3. Main modules
-4. Important technologies
-5. Data flow
-6. Overall architecture pattern
-7. Important observations
-
-Base every statement on the repository context provided below. Do not
-invent files, modules, or technologies that are not present.
-"""
-
-    summary = ai_service.chat(
-        question=prompt,
-        context=context,
     )
 
     return {
@@ -516,7 +491,7 @@ def render_tree(tree: list[dict], depth: int = 0) -> list[str]:
     return lines
 
 
-def build_llm_context(
+def build_architecture_summary(
     *,
     tree: list[dict],
     analysis: dict,
@@ -525,8 +500,7 @@ def build_llm_context(
     technologies: list[str],
 ) -> str:
     """
-    Builds the grounded repository context sent to the LLM so the
-    architecture summary is based on real data.
+    Builds a deterministic architecture summary from repository data.
     """
 
     parts: list[str] = []

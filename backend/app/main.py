@@ -9,7 +9,6 @@ from app.config import settings
 from app.routes.repositories import router as repositories_router
 from app.routes.analyze import router as analyze_router
 from app.routes.architecture import router as architecture_router
-from app.routes.chat import router as chat_router
 from app.routes.docs import router as docs_router
 from app.routes.graph import router as graph_router
 from app.routes.overview import router as overview_router
@@ -99,7 +98,5 @@ app.include_router(overview_router, tags=["Overview"])
 app.include_router(architecture_router, tags=["Architecture"])
 
 app.include_router(graph_router, tags=["Dependency Graph"])
-
-app.include_router(chat_router, tags=["AI Chat"])
 
 app.include_router(docs_router, tags=["Documentation"])

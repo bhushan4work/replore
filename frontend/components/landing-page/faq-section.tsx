@@ -8,7 +8,7 @@ const faqs = [
   {
     question: "How does Replore analyze a GitHub repository?",
     answer:
-      "Replore clones the repository, parses the source code using Tree-sitter, builds dependency relationships, generates embeddings, and lets you explore the project using AI.",
+      "Replore clones the repository, analyzes its source code, builds dependency relationships, and lets you explore the project.",
   },
   {
     question: "Does Replore support private repositories?",
@@ -20,16 +20,6 @@ const faqs = [
     answer:
       "Replore is designed around Tree-sitter, allowing support for many popular languages including JavaScript, TypeScript, Python, Go, Java, Rust, C++, and more.",
   },
-  {
-    question: "Can I chat with my repository?",
-    answer:
-      "Yes. Once the repository has been analyzed, you can ask questions about architecture, functions, folders, dependencies, setup instructions, and implementation details.",
-  },
-  {
-    question: "What AI models power Replore?",
-    answer:
-      "The MVP uses Gemini 2.5 Flash for reasoning and Gemini Embeddings together with pgvector for semantic code search.",
-  }
   
 
 ];
@@ -52,11 +42,11 @@ export default function FAQSection() {
               <br />
               questions?
               <br />
-              <span className="text-violet-600">we've got you</span>
+              <span className="text-violet-600">we&apos;ve got you</span>
             </h2>
 
             <p className="mt-8 max-w-xs text-lg leading-6 text-[#6B6B6B]">
-              Can't find what you're looking for?{" "}
+              Can&apos;t find what you&apos;re looking for?{" "}
               <Link
                 href="https://x.com/Bhushan4work_"
                 className="font-medium text-violet-600 transition hover:underline"

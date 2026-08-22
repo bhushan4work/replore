@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  RepoChatCard,
   ImportCard,
   DependencyCard,
   DocsCard,
@@ -22,12 +21,12 @@ export default function FeaturesSection() {
         <div className="mx-auto max-w-6xl text-center">
 
           <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:mt-6 sm:text-4xl md:text-5xl lg:text-6xl">
-            Powerful AI Tools for every repository
+            Powerful tools for every repository
           </h2>
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400 sm:mt-6 sm:text-lg sm:leading-8">
-            Explore, understand and document any GitHub repository with AI.
-            Built for developers who need answers instantly.
+            Explore, understand and document any GitHub repository.
+            Built for developers who need clarity quickly.
           </p>
         </div>
 
@@ -38,7 +37,7 @@ export default function FeaturesSection() {
           {/* Left */}
 
           <div className="lg:col-span-8">
-            <RepoChatCard />
+            <OverviewCard />
           </div>
 
           {/* Right */}
@@ -57,9 +56,6 @@ export default function FeaturesSection() {
           </div>
 
           {/* Bottom Right */}
-          <div className="lg:col-span-4">
-            <OverviewCard />
-          </div>
 
         </div>
       </div>

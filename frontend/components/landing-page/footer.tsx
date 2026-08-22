@@ -16,7 +16,7 @@ export default function Footer() {
 
             <p className="mt-6 max-w-xs text-xl leading-8 text-white/55">
               Discover, understand and explore any GitHub repository instantly
-              with AI-powered code intelligence.
+              with focused code intelligence.
             </p>
           </div>
 

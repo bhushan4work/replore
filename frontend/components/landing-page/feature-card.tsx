@@ -1,18 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import { FaGithub } from "react-icons/fa";
 import {
-  ArrowRight,
-  MessageSquare,
-  GitBranch,
   FolderGit2,
-  FileText,
-  Sparkles,
-  CheckCircle2,
-  BarChart3,
-  FolderTree,
-  Code2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,75 +32,6 @@ function Card({ children, className }: CardProps) {
         {children}
       </div>
     </div>
-  );
-}
-
-
-export function RepoChatCard() {
-  return (
-    <Card className="min-h-[390px] sm:min-h-[430px] lg:min-h-[450px]">
-      <div className="relative flex h-full flex-col">
-
-
-      {/* Purple Corner Glow */}
-      <div className="pointer-events-none absolute -right-52 -top-52 h-[300px] w-[300px] rounded-full bg-violet-500/30 blur-[100px]" />
-      
-        {/* Model Badge */}
-        <div className="relative">
-          <div className="flex items-center">
-            <span className="text-[10px] font-medium tracking-[0.18em] text-violet-400 uppercase">
-              Replore AI
-            </span>
-          </div>
-        </div>
-
-        {/* Hero */}
-        <div className="relative mt-4">
-          <h3 className="text-xl font-semibold text-white sm:text-2xl">
-            Repository AI Chat
-          </h3>
-
-          <p className="mt-2 max-w-[760px] text-md leading-6 text-violet-300/90">
-            Converse with your repository. Ask about architecture,
-            dependencies, code flow, documentation and implementation details
-            in real-time.
-          </p>
-        </div>
-
-        {/* Conversation */}
-
-        <div className="relative mt-8 flex flex-1 flex-col">
-
-          {/* User Bubble */}
-          <div className="flex justify-end">
-            <div className="rounded-[12px] border border-white/10 bg-[#26262B] px-6 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-              <p className="text-[16px] text-zinc-100">
-                Explain the authentication flow in auth.ts?
-              </p>
-            </div>
-          </div>
-
-          {/* AI Bubble */}
-          <div className="mt-6 max-w-[82%]">
-            <div className="rounded-[12px] border border-violet-500/40 bg-[#2A203D] px-6 py-3 shadow-[0_0_40px_rgba(124,58,237,0.08)]">
-              <p className="font-mono text-[16px] leading-5 text-[#D9D0FF]">
-                The flow uses JWT with a 15-minute rotation.
-                It's initialized in the Middleware layer...
-              </p>
-            </div>
-          </div>
-
-          {/* Second User Bubble */}
-          <div className="mt-8 flex justify-end">
-            <div className="rounded-[12px] border border-white/10 bg-[#26262B] px-6 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-              <p className="text-[16px] text-zinc-100">
-                Can we optimize the refresh token logic?
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Card>
   );
 }
 

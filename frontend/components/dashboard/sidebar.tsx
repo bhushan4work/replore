@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    List,
     Folder,
     GitBranch,
     Files,
-    ChatCircleDots,
     CaretLeft,
     CaretRight,
     SquaresFour,
@@ -42,12 +40,6 @@ const ITEM_DEFS = [
         slug: "docs",
         icon: Files,
         color: "text-orange-400",
-    },
-    {
-        title: "ai chat",
-        slug: "chat",
-        icon: ChatCircleDots,
-        color: "text-emerald-400",
     },
 ];
 

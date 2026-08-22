@@ -53,8 +53,7 @@ ENV/
 htmlcov/
 
 
-# Database / AI
-backend/chroma_db/
+# Database
 backend/repositories/
 *.sqlite3
 *.db
@@ -68,3 +67,5 @@ backend/repositories/
 .cache/
 tmp/
 temp/
+
+CONTEXT_UPDATED.md
