@@ -18,6 +18,8 @@
     "@xyflow/react": "^12.11.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "d3-force": "^3.0.0",
+    "dagre": "^0.8.5",
     "lucide-react": "^1.27.0",
     "next": "16.2.10",
     "phosphor-icons": "^1.4.2",
@@ -32,6 +34,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/d3-force": "^3.0.10",
+    "@types/dagre": "^0.7.54",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

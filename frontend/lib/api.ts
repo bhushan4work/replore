@@ -217,16 +217,35 @@ export async function getRepositoryArchitecture(
   return res.json();
 }
 
+export interface RepositoryGraphNodeData {
+  label: string;
+  filePath: string;
+  group: string;
+  fileType: string;
+  inDegree: number;
+  outDegree: number;
+  score: number;
+}
+
 export interface RepositoryGraphNode {
   id: string;
-  data: { label: string };
+  data: RepositoryGraphNodeData;
   position: { x: number; y: number };
+  type?: string;
 }
 
 export interface RepositoryGraphEdge {
   id: string;
   source: string;
   target: string;
+  data?: { edgeType?: string };
+}
+
+export interface RepositoryGraphStats {
+  totalNodes: number;
+  totalEdges: number;
+  groups: string[];
+  fileTypes: string[];
 }
 
 export interface RepositoryGraph {
@@ -234,15 +253,40 @@ export interface RepositoryGraph {
   graph: {
     nodes: RepositoryGraphNode[];
     edges: RepositoryGraphEdge[];
+    truncated?: boolean;
+    total_nodes?: number;
+    stats?: RepositoryGraphStats;
   };
 }
 
+export interface GraphQueryParams {
+  seed?: string;
+  k?: number;
+  direction?: "forward" | "reverse" | "both";
+  groups?: string[];
+  fileTypes?: string[];
+  minScore?: number;
+}
+
 export async function getRepositoryGraph(
-  repositoryId: string
+  repositoryId: string,
+  params?: GraphQueryParams,
 ): Promise<RepositoryGraph> {
-  const res = await fetch(
-    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/graph`
+  const url = new URL(
+    `${API_BASE_URL}/api/repositories/${encodeURIComponent(repositoryId)}/graph`,
   );
+
+  if (params?.seed) url.searchParams.set("seed", params.seed);
+  if (params?.k !== undefined) url.searchParams.set("k", String(params.k));
+  if (params?.direction) url.searchParams.set("direction", params.direction);
+  if (params?.groups?.length)
+    url.searchParams.set("groups", params.groups.join(","));
+  if (params?.fileTypes?.length)
+    url.searchParams.set("file_types", params.fileTypes.join(","));
+  if (params?.minScore !== undefined)
+    url.searchParams.set("min_score", String(params.minScore));
+
+  const res = await fetch(url.toString());
 
   if (!res.ok) {
     throw await parseError(res);

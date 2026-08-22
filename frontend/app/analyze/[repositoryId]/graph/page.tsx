@@ -16,26 +16,18 @@ function GraphError({ message }: { message: string }) {
   );
 }
 
-function toRepoGraphNode(
-  node: RepositoryGraphNode
-): {
-  id: string;
-  label: string;
-  filePath: string;
-  group: string;
-  imports: string[];
-  exports: string[];
-  position: { x: number; y: number };
-} {
-  const parts = node.id.replace(/\\/g, "/").split("/").filter(Boolean);
-
+function toRepoGraphNode(node: RepositoryGraphNode) {
+  // The enhanced backend now provides all metadata in node.data.
+  const d = node.data;
   return {
     id: node.id,
-    label: parts[parts.length - 1] ?? node.id,
-    filePath: node.id,
-    group: parts.length > 1 ? parts[0] : "root",
-    imports: [],
-    exports: [],
+    label: d.label ?? node.id,
+    filePath: d.filePath ?? node.id,
+    group: d.group ?? "root",
+    fileType: d.fileType ?? "",
+    inDegree: d.inDegree ?? 0,
+    outDegree: d.outDegree ?? 0,
+    score: d.score ?? 0,
     position: node.position,
   };
 }
@@ -65,8 +57,12 @@ export default async function GraphPage({
 
   return (
     <RepoGraph
+      repositoryId={repositoryId}
       nodes={graph.graph.nodes.map(toRepoGraphNode)}
       edges={graph.graph.edges}
+      stats={graph.graph.stats}
+      truncated={graph.graph.truncated}
+      totalNodes={graph.graph.total_nodes}
     />
   );
 }
